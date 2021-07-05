@@ -1,5 +1,7 @@
 package io.route;
 
+import io.route.util.CharBuffer;
+
 public class SeparableVariableToken extends Variable implements Token {
     private final char separator;
 

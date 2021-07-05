@@ -1,5 +1,7 @@
 package io.route;
 
+import io.route.util.CharBuffer;
+
 import java.util.Objects;
 
 public class ConstToken implements Token {

@@ -1,5 +1,8 @@
 package io.route;
 
+import io.route.util.CharBuffer;
+import io.route.util.MutableCharBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +14,7 @@ public record SimpleQueryParser(char separator) implements QueryParser {
     public List<Token> parse(CharBuffer input) {
         QueryParseException.failIf(input.isEmpty(), "Input must not be empty");
 
-        CharBuffer buffer = new CharBuffer(input);
+        MutableCharBuffer buffer = new MutableCharBuffer(input);  // copy to avoid modifying the input
         ArrayList<Token> tokens = new ArrayList<>();
         while (true) {
             int length = buffer.length();

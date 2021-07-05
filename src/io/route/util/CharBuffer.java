@@ -1,4 +1,4 @@
-package io.route;
+package io.route.util;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -7,9 +7,9 @@ import java.util.Objects;
  *
  */
 public class CharBuffer implements CharSequence {
-    private final char[] chars;
-    private int start;
-    private int end;
+    protected final char[] chars;
+    protected int start;
+    protected int end;
 
     public CharBuffer(char[] chars, int start, int end) {
         assert 0 <= start;
@@ -86,14 +86,12 @@ public class CharBuffer implements CharSequence {
         return substring(start, end);
     }
 
-    public void offsetStart(int offset) {
-        start += offset;
-        assert start <= end;
+    public MutableCharBuffer mutable() {
+        return new MutableCharBuffer(chars, start, end);
     }
 
-    public void offsetEnd(int offset) {
-        end -= offset;
-        assert start <= end;
+    public CharBuffer immutable() {
+        return this;
     }
 
     public int matchUntil(char ch) {
