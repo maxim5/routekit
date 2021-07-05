@@ -11,6 +11,46 @@ import java.util.stream.Collectors;
 
 public class RouterTest {
     @Test
+    public void routeOrNull_just_variable_rule() {
+        Router<String> router = new RouterSetup<String>()
+                .add("{var}", "1")
+                .build();
+
+        Assertions.assertEquals(match("1", "var=foo"), router.routeOrNull("foo"));
+        Assertions.assertEquals(match("1", "var=FOO"), router.routeOrNull("FOO"));
+        Assertions.assertEquals(match("1", "var=_"), router.routeOrNull("_"));
+
+        // Doesn't match the slash
+        Assertions.assertNull(router.routeOrNull(""));  // var can't be empty
+        Assertions.assertNull(router.routeOrNull("/"));
+        Assertions.assertNull(router.routeOrNull("foo/"));
+        Assertions.assertNull(router.routeOrNull("/foo/"));
+    }
+
+    @Test
+    public void routeOrNull_const_variable_rule() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/{var}", "1")
+                .build();
+
+        Assertions.assertEquals(match("1", "var=foo"), router.routeOrNull("/foo/foo"));
+        Assertions.assertEquals(match("1", "var=FOO"), router.routeOrNull("/foo/FOO"));
+        Assertions.assertEquals(match("1", "var=_"), router.routeOrNull("/foo/_"));
+
+        // Not found
+        Assertions.assertNull(router.routeOrNull("/foo/"));  // var can't be empty
+        Assertions.assertNull(router.routeOrNull("/"));
+        Assertions.assertNull(router.routeOrNull("//"));
+        Assertions.assertNull(router.routeOrNull("foo/"));
+        Assertions.assertNull(router.routeOrNull("/foobar"));
+
+        // Doesn't match the slash
+        Assertions.assertNull(router.routeOrNull("foo//"));
+        Assertions.assertNull(router.routeOrNull("foo/bar/"));
+        Assertions.assertNull(router.routeOrNull("foo/bar//"));
+    }
+
+    @Test
     public void routeOrNull_const_and_two_vars() {
         Router<String> router = new RouterSetup<String>()
                 .add("/foo/bar", "1")
@@ -26,8 +66,10 @@ public class RouterTest {
         Assertions.assertNull(router.routeOrNull("/foo/bar/"));
 
         // First var
+        Assertions.assertEquals(match("2", "name=foo"), router.routeOrNull("/foo/foo"));
         Assertions.assertEquals(match("2", "name=XXX"), router.routeOrNull("/foo/XXX"));
-        Assertions.assertNull(router.routeOrNull("/foo/"));
+        Assertions.assertEquals(match("2", "name=_"), router.routeOrNull("/foo/_"));
+        Assertions.assertNull(router.routeOrNull("/foo/"));  // name can't be empty
         Assertions.assertNull(router.routeOrNull("/foo/XXX/"));
 
         // Second var
@@ -42,7 +84,7 @@ public class RouterTest {
 
     private Router.Match<String> match(String tag, String ... variables) {
         Map<String, CharBuffer> map = Arrays.stream(variables)
-                .map(var -> var.split("="))
+                .map(var -> var.split("=", -1))
                 .filter(split -> split.length == 2)
                 .collect(Collectors.toMap(split -> split[0], split -> new CharBuffer(split[1])));
         return match(tag, map);

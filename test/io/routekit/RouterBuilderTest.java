@@ -9,9 +9,9 @@ import static io.routekit.NodePrinter.printlnToString;
 
 public class RouterBuilderTest {
     @Test
-    public void buildStateAutomaton_constants_common_part() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
-        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
+    public void buildStateMachine_constants_common_part() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/baz")
         ));
@@ -24,9 +24,9 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateAutomaton_constants_height_2() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
-        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
+    public void buildStateMachine_constants_height_2() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
                 rule("1", "/"),
                 rule("2", "/foo/bar"),
                 rule("3", "/foo/bar/baz"),
@@ -42,9 +42,9 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateAutomaton_const_excluded_and_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
-        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
+    public void buildStateMachine_const_excluded_and_vars_common_prefix() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/", "{name}"),
                 rule("3", "/foo/", "{name}", "/", "{age}")
@@ -60,9 +60,9 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateAutomaton_const_included_and_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(true);
-        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
+    public void buildStateMachine_const_included_and_vars_common_prefix() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(true);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/", "{name}"),
                 rule("3", "/foo/", "{name}", "/", "{age}")
@@ -77,9 +77,9 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateAutomaton_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
-        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
+    public void buildStateMachine_vars_common_prefix() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
                 rule("1", "/foo/", "{name}"),
                 rule("2", "/foo/", "{name}", "/", "{age}")
         ));
