@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class RouterBuilderTest {
     @Test
     public void build_constants0() {
-        RouterBuilder.Node<String> node = RouterBuilder.build(Arrays.asList(
+        RouterBuilder.Node<String> node = RouterBuilder.buildNode(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/baz")
         ));
@@ -16,7 +16,7 @@ public class RouterBuilderTest {
 
     @Test
     public void build_constants1() {
-        RouterBuilder.Node<String> node = RouterBuilder.build(Arrays.asList(
+        RouterBuilder.Node<String> node = RouterBuilder.buildNode(Arrays.asList(
                 rule("1", "/"),
                 rule("2", "/foo/bar"),
                 rule("3", "/foo/bar/baz"),
