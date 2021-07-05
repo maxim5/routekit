@@ -42,7 +42,7 @@ public class Router<T> {
         Map<String, CharBuffer> vars = new HashMap<>();
 
         while (buffer.isNotEmpty()) {
-            int maxMatch = 0;
+            int maxMatch = -1;
             RouterBuilder.Node<T> maxNode = null;
             for (RouterBuilder.Node<T> next : current.next()) {
                 int matchLength = next.token().match(buffer);
