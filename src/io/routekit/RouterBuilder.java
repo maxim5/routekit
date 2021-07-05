@@ -7,21 +7,21 @@ import java.util.stream.Collectors;
 
 public class RouterBuilder {
     private boolean quickMatchForConst = true;
-    private boolean excludeConstInSA = true;
+    private boolean excludeConstFromFSM = true;
 
     public RouterBuilder setQuickMatchForConst(boolean quickMatchForConst) {
         this.quickMatchForConst = quickMatchForConst;
         return this;
     }
 
-    public RouterBuilder setExcludeConstInSA(boolean excludeConstInSA) {
-        this.excludeConstInSA = excludeConstInSA;
+    public RouterBuilder setExcludeConstFromFSM(boolean excludeConstFromFSM) {
+        this.excludeConstFromFSM = excludeConstFromFSM;
         return this;
     }
 
     public <T> Router<T> buildRouter(List<RouterSetup.Rule<T>> rules) {
         Map<CharBuffer, T> quickMatchIndex = buildQuickMatchIndex(rules);
-        RouterBuilder.Node<T> root = buildStateAutomaton(rules);
+        RouterBuilder.Node<T> root = buildStateMachine(rules);
         return new Router<>(quickMatchIndex, root);
     }
 
@@ -36,9 +36,9 @@ public class RouterBuilder {
             Collections.emptyMap();
     }
 
-    /*package*/ <T> Node<T> buildStateAutomaton(List<RouterSetup.Rule<T>> rules) {
+    /*package*/ <T> Node<T> buildStateMachine(List<RouterSetup.Rule<T>> rules) {
         List<Sequence<T>> sequences = rules.stream()
-                .filter(rule -> !excludeConstInSA || !rule.isConstant())
+                .filter(rule -> !excludeConstFromFSM || !rule.isConstant())
                 .map(rule -> new Sequence<>(new LinkedList<>(rule.query().tokens()), rule))
                 .toList();
 
