@@ -32,6 +32,9 @@ public record SimpleQueryParser(char separator) implements QueryParser {
                 QueryParseException.failIf(!varName.matches("[^{}*]+"), "Query contains invalid variable: " + input);
 
                 Token token = isWildcard ? new WildcardToken(varName) : new SeparableVariableToken(varName, separator);
+                QueryParseException.failIf(
+                        tokens.stream().filter(t -> t instanceof Variable).anyMatch(t -> t.equals(token)),
+                        "Query contains duplicate variables: " + input);
                 tokens.add(token);
 
                 buffer.offsetStart(close + 1);

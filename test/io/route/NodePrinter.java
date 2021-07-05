@@ -37,7 +37,7 @@ public class NodePrinter {
         out.print(node.token());
         if (node.isTerminal()) {
             out.print(" -> ");
-            out.print(node.terminalRule() != null ? node.terminalRule().handler() : null);
+            out.print(node.terminalRule().handler());
         }
         out.println();
 

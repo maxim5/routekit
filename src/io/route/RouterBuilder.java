@@ -38,7 +38,7 @@ public class RouterBuilder {
 
     /*package*/ <T> Node<T> buildStateAutomaton(List<RouterSetup.Rule<T>> rules) {
         List<Sequence<T>> sequences = rules.stream()
-                .filter(rule -> !excludeConstInSA || rule.isConstant())
+                .filter(rule -> !excludeConstInSA || !rule.isConstant())
                 .map(rule -> new Sequence<>(new LinkedList<>(rule.query().tokens()), rule))
                 .toList();
 
@@ -46,6 +46,12 @@ public class RouterBuilder {
     }
 
     private static <T> Node<T> buildNode(Token start, List<Sequence<T>> sequences) {
+        RouterSetup.Rule<T> terminalRule = sequences.stream()
+                .filter(seq -> seq.tokens.isEmpty())
+                .map(seq -> seq.rule)
+                .findFirst()
+                .orElse(null);
+
         CharBuffer commonPrefix = sequences.stream()
                 .map(seq -> seq.tokens.peek() instanceof ConstToken constToken ? constToken.buffer() : null)
                 .reduce(null, (lhs, rhs) -> {
@@ -71,7 +77,6 @@ public class RouterBuilder {
         List<Node<T>> nodes = group.entrySet().stream()
                 .map(entry -> buildNode(entry.getKey(), entry.getValue()))
                 .toList();
-        RouterSetup.Rule<T> terminalRule = sequences.size() == 1 ? sequences.get(0).rule : null;
         return new Node<>(start, nodes, terminalRule);
     }
 
@@ -91,6 +96,10 @@ public class RouterBuilder {
 
     record Node<T>(Token token, List<Node<T>> next, RouterSetup.Rule<T> terminalRule) {
         public boolean isTerminal() {
+            return terminalRule != null;  // Note: non-leaf nodes can be terminal.
+        }
+
+        public boolean isLeaf() {
             return next.isEmpty();
         }
     }

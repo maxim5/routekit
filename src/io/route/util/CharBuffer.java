@@ -86,6 +86,16 @@ public class CharBuffer implements CharSequence {
         return substring(start, end);
     }
 
+    public boolean startsWith(CharBuffer prefix) {
+        return length() >= prefix.length() &&
+                Arrays.equals(chars, start, start + prefix.length(), prefix.chars, prefix.start, prefix.end);
+    }
+
+    public boolean endsWith(CharBuffer suffix) {
+        return length() >= suffix.length() &&
+                Arrays.equals(chars, end - suffix.length(), end, suffix.chars, suffix.start, suffix.end);
+    }
+
     public MutableCharBuffer mutable() {
         return new MutableCharBuffer(chars, start, end);
     }

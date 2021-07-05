@@ -14,11 +14,9 @@ public class Variable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Variable variable = (Variable) o;
-        return Objects.equals(name, variable.name);
+    public boolean equals(Object other) {
+        // Note: does not matter if it's a wildcard or not
+        return this == other || other instanceof Variable variable && Objects.equals(name, variable.name);
     }
 
     @Override

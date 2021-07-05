@@ -10,13 +10,13 @@ import static io.route.SimpleQueryParser.DEFAULT;
 
 public class SimpleQueryParserTest {
     @Test
-    public void parseNoVariables() {
+    public void parse_no_variables() {
         assertOrdered(DEFAULT.parse("/"), new ConstToken("/"));
         assertOrdered(DEFAULT.parse("foo-bar-baz"), new ConstToken("foo-bar-baz"));
     }
 
     @Test
-    public void parseVariable() {
+    public void parse_variable() {
         assertOrdered(DEFAULT.parse("{foo}"), new SeparableVariableToken("foo"));
         assertOrdered(DEFAULT.parse("/{foo}"), new ConstToken("/"), new SeparableVariableToken("foo"));
         assertOrdered(DEFAULT.parse("{foo}/"), new SeparableVariableToken("foo"), new ConstToken("/"));
@@ -24,7 +24,7 @@ public class SimpleQueryParserTest {
     }
 
     @Test
-    public void parseSeveralVariables() {
+    public void parse_several_variables() {
         assertOrdered(DEFAULT.parse("/foo/{xxx}/{y}/{*z}"),
                 new ConstToken("/foo/"),
                 new SeparableVariableToken("xxx"),
@@ -32,6 +32,20 @@ public class SimpleQueryParserTest {
                 new SeparableVariableToken("y"),
                 new ConstToken("/"),
                 new WildcardToken("z"));
+    }
+
+    @Test
+    public void parse_invalid() {
+        // Invalid brackets
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{"));
+        // Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{}{"));
+
+        // Invalid name
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{dup}{dup}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{dup}{*dup}"));
     }
 
     @SafeVarargs

@@ -41,7 +41,7 @@ public class Router<T> {
         MutableCharBuffer buffer = input.mutable();
         Map<String, CharBuffer> vars = new HashMap<>();
 
-        while (!current.isTerminal()) {
+        while (buffer.isNotEmpty()) {
             int maxMatch = 0;
             RouterBuilder.Node<T> maxNode = null;
             for (RouterBuilder.Node<T> next : current.next()) {
@@ -61,8 +61,8 @@ public class Router<T> {
             current = maxNode;
         }
 
-        if (buffer.isNotEmpty()) {
-            return null;  // does not match the full input
+        if (!current.isTerminal()) {
+            return null;  // matches part of the rule
         }
         return new Match<>(current.terminalRule().handler(), vars);
     }

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class CharBufferTest {
     @Test
-    public void createEmpty() {
+    public void create_empty_string() {
         CharBuffer buffer = new CharBuffer("");
         Assertions.assertEquals(buffer.start(), 0);
         Assertions.assertEquals(buffer.end(), 0);
@@ -14,7 +14,7 @@ public class CharBufferTest {
     }
 
     @Test
-    public void createEmpty2() {
+    public void create_empty_same_pointers() {
         CharBuffer buffer = new CharBuffer("foo", 3, 3);
         Assertions.assertEquals(buffer.start(), 3);
         Assertions.assertEquals(buffer.end(), 3);
@@ -29,7 +29,7 @@ public class CharBufferTest {
     }
 
     @Test
-    public void createInvalid() {
+    public void create_invalid_pointers() {
         Assertions.assertThrows(AssertionError.class, () -> new CharBuffer("foo", -1, 2));
         Assertions.assertThrows(AssertionError.class, () -> new CharBuffer("foo", 4, 4));
     }
@@ -52,5 +52,33 @@ public class CharBufferTest {
         Assertions.assertEquals(7, buffer.matchUntil(4, '-'));
         Assertions.assertEquals(7, buffer.matchUntil(7, '-'));
         Assertions.assertEquals(11, buffer.matchUntil(8, '-'));
+    }
+
+    @Test
+    public void startsWith() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.startsWith(new CharBuffer("")));
+        Assertions.assertTrue(buffer.startsWith(new CharBuffer("f")));
+        Assertions.assertTrue(buffer.startsWith(new CharBuffer("fo")));
+        Assertions.assertTrue(buffer.startsWith(new CharBuffer("foo")));
+
+        Assertions.assertFalse(buffer.startsWith(new CharBuffer("x")));
+        Assertions.assertFalse(buffer.startsWith(new CharBuffer("bar")));
+        Assertions.assertFalse(buffer.startsWith(new CharBuffer("foo!")));
+        Assertions.assertFalse(buffer.startsWith(new CharBuffer("foobar")));
+    }
+
+    @Test
+    public void endsWith() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.endsWith(new CharBuffer("")));
+        Assertions.assertTrue(buffer.endsWith(new CharBuffer("o")));
+        Assertions.assertTrue(buffer.endsWith(new CharBuffer("oo")));
+        Assertions.assertTrue(buffer.endsWith(new CharBuffer("foo")));
+
+        Assertions.assertFalse(buffer.endsWith(new CharBuffer("x")));
+        Assertions.assertFalse(buffer.endsWith(new CharBuffer("bar")));
+        Assertions.assertFalse(buffer.endsWith(new CharBuffer("!foo")));
+        Assertions.assertFalse(buffer.endsWith(new CharBuffer("barfoo")));
     }
 }

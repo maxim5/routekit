@@ -17,7 +17,9 @@ public class ConstToken implements Token {
 
     @Override
     public int match(CharBuffer buffer) {
-        return buffer.matchCommon(token);
+        // Prefix match should work: "/foo".match("/foo/bar") == 4
+        // Partial match should not work: "/foo".match("/") == 0
+        return buffer.startsWith(token) ? token.length() : 0;
     }
 
     public CharBuffer buffer() {
