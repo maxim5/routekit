@@ -74,9 +74,10 @@ public class RouterBuilder {
             }
         }
 
-        List<Node<T>> nodes = group.entrySet().stream()
+        @SuppressWarnings("unchecked")
+        Node<T>[] nodes = group.entrySet().stream()
                 .map(entry -> buildNode(entry.getKey(), entry.getValue()))
-                .toList();
+                .toArray(Node[]::new);
         return new Node<>(start, nodes, terminalRule);
     }
 
@@ -94,13 +95,13 @@ public class RouterBuilder {
 
     private record Sequence<T>(LinkedList<Token> tokens, RouterSetup.Rule<T> rule) {}
 
-    record Node<T>(Token token, List<Node<T>> next, RouterSetup.Rule<T> terminalRule) {
+    record Node<T>(Token token, Node<T>[] next, RouterSetup.Rule<T> terminalRule) {
         public boolean isTerminal() {
             return terminalRule != null;  // Note: non-leaf nodes can be terminal.
         }
 
         public boolean isLeaf() {
-            return next.isEmpty();
+            return next.length == 0;
         }
     }
 }
