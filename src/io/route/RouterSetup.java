@@ -1,7 +1,5 @@
 package io.route;
 
-import io.route.util.CharBuffer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +44,7 @@ public class RouterSetup<T> {
     }
 
     public Router<T> build() {
-        Map<CharBuffer, T> quickMatchIndex = builder.buildQuickMatchIndex(rules);
-        RouterBuilder.Node<T> root = builder.buildNode(rules);
-        return new Router<>(quickMatchIndex, root);
+        return builder.buildRouter(rules);
     }
 
     record Rule<T>(Query query, T handler) {

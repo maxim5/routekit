@@ -11,8 +11,8 @@ import static io.route.NodePrinter.printlnToString;
 public class RouterBuilderTest {
     @Test
     public void build_constantsCommonPart() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConst(false);
-        RouterBuilder.Node<String> node = builder.buildNode(Arrays.asList(
+        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
+        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/baz")
         ));
@@ -26,8 +26,8 @@ public class RouterBuilderTest {
 
     @Test
     public void build_constantsTwoLevels() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConst(false);
-        RouterBuilder.Node<String> node = builder.buildNode(Arrays.asList(
+        RouterBuilder builder = new RouterBuilder().setExcludeConstInSA(false);
+        RouterBuilder.Node<String> node = builder.buildStateAutomaton(Arrays.asList(
                 rule("1", "/"),
                 rule("2", "/foo/bar"),
                 rule("3", "/foo/bar/baz"),

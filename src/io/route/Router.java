@@ -16,14 +16,29 @@ public class Router<T> {
         this.root = root;
     }
 
+    public Match<T> routeOrNull(String input) {
+        return routeOrNull(new MutableCharBuffer(input));
+    }
+
+    public Match<T> routeOrNull(CharSequence input) {
+        return routeOrNull(new MutableCharBuffer(input));
+    }
+
+    public Match<T> routeOrNull(char[] input) {
+        return routeOrNull(new MutableCharBuffer(input));
+    }
+
     public Match<T> routeOrNull(CharBuffer input) {
         T match = quickMatchIndex.get(input);
         if (match != null) {
             return new Match<>(match, Collections.emptyMap());
         }
 
+        return navigate(input, root);
+    }
+
+    private static <T> Match<T> navigate(CharBuffer input, RouterBuilder.Node<T> current) {
         MutableCharBuffer buffer = input.mutable();
-        RouterBuilder.Node<T> current = root;
         Map<String, CharBuffer> vars = new HashMap<>();
 
         while (!current.isTerminal()) {
@@ -50,18 +65,6 @@ public class Router<T> {
             return null;  // does not match the full input
         }
         return new Match<>(current.terminalRule().handler(), vars);
-    }
-
-    public Match<T> routeOrNull(String input) {
-        return routeOrNull(new MutableCharBuffer(input));
-    }
-
-    public Match<T> routeOrNull(CharSequence input) {
-        return routeOrNull(new MutableCharBuffer(input));
-    }
-
-    public Match<T> routeOrNull(char[] input) {
-        return routeOrNull(new MutableCharBuffer(input));
     }
 
     record Match<T>(T handler, Map<String, CharBuffer> variables) {}
