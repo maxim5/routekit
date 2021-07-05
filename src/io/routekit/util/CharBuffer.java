@@ -1,4 +1,4 @@
-package io.route.util;
+package io.routekit.util;
 
 import java.util.Arrays;
 import java.util.Objects;

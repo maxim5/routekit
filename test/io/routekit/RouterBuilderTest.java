@@ -1,11 +1,11 @@
-package io.route;
+package io.routekit;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static io.route.NodePrinter.printlnToString;
+import static io.routekit.NodePrinter.printlnToString;
 
 public class RouterBuilderTest {
     @Test

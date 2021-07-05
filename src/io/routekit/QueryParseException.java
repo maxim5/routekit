@@ -1,4 +1,4 @@
-package io.route;
+package io.routekit;
 
 public class QueryParseException extends RuntimeException {
     public QueryParseException() {

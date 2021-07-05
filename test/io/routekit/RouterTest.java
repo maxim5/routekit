@@ -1,6 +1,6 @@
-package io.route;
+package io.routekit;
 
-import io.route.util.CharBuffer;
+import io.routekit.util.CharBuffer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

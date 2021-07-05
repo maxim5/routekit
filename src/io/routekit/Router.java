@@ -1,7 +1,7 @@
-package io.route;
+package io.routekit;
 
-import io.route.util.CharBuffer;
-import io.route.util.MutableCharBuffer;
+import io.routekit.util.CharBuffer;
+import io.routekit.util.MutableCharBuffer;
 
 import java.util.Collections;
 import java.util.HashMap;
