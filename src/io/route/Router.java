@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Router<T> {
-    private final RouterBuilder.Node<T> root;
     private final Map<CharBuffer, T> quickMatchIndex;
+    private final RouterBuilder.Node<T> root;
 
-    public Router(RouterBuilder.Node<T> root, Map<CharBuffer, T> quickMatchIndex) {
-        this.root = root;
+    public Router(Map<CharBuffer, T> quickMatchIndex, RouterBuilder.Node<T> root) {
         this.quickMatchIndex = quickMatchIndex;
+        this.root = root;
     }
 
     public Match<T> routeOrNull(CharBuffer input) {
@@ -46,7 +46,7 @@ public class Router<T> {
             current = maxNode;
         }
 
-        if (buffer.isEmpty()) {
+        if (buffer.isNotEmpty()) {
             return null;  // does not match the full input
         }
         return new Match<>(current.terminalRule().handler(), vars);

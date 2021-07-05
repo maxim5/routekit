@@ -1,55 +1,50 @@
 package io.route;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static io.route.NodePrinter.println;
+import static io.route.NodePrinter.printlnToString;
+
 public class RouterBuilderTest {
     @Test
-    public void build_constants0() {
-        RouterBuilder.Node<String> node = RouterBuilder.buildNode(Arrays.asList(
+    public void build_constantsCommonPart() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConst(false);
+        RouterBuilder.Node<String> node = builder.buildNode(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/baz")
         ));
-        println(node, 0);
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/foo/ba]
+                ConstToken[z] -> 2
+                ConstToken[r] -> 1
+        """);
     }
 
     @Test
-    public void build_constants1() {
-        RouterBuilder.Node<String> node = RouterBuilder.buildNode(Arrays.asList(
+    public void build_constantsTwoLevels() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConst(false);
+        RouterBuilder.Node<String> node = builder.buildNode(Arrays.asList(
                 rule("1", "/"),
                 rule("2", "/foo/bar"),
                 rule("3", "/foo/bar/baz"),
                 rule("4", "/bar")
         ));
-        println(node, 0);
+        println(node);
     }
 
-    private RouterSetup.Rule<String> rule(String tag, String ... tokens) {
-        return new RouterSetup.Rule<>(() -> Arrays.stream(tokens).map(this::convert).toList(), tag);
+    private static RouterSetup.Rule<String> rule(String tag, String ... tokens) {
+        return new RouterSetup.Rule<>(() -> Arrays.stream(tokens).map(RouterBuilderTest::convert).toList(), tag);
     }
 
-    private Token convert(String token) {
+    private static Token convert(String token) {
         return token.startsWith("$") ? new SeparableVariableToken(token) : new ConstToken(token);
     }
 
-    private static <T> void println(RouterBuilder.Node<T> node, int indent) {
-        indent(indent);
-        System.out.print(node.token());
-        if (node.isTerminal()) {
-            System.out.print(" -> ");
-            System.out.print(node.terminalRule());
-        }
-        System.out.println();
-
-        for (RouterBuilder.Node<T> next : node.next()) {
-            println(next, indent + 4);
-        }
-    }
-
-    private static void indent(int num) {
-        for (int i = 0; i < num; i++) {
-            System.out.print(' ');
-        }
+    private static void assertLines(String actual, String expected) {
+        Assertions.assertLinesMatch(expected.lines(), actual.lines());
     }
 }

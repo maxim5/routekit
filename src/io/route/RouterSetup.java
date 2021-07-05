@@ -8,10 +8,17 @@ import java.util.Map;
 
 public class RouterSetup<T> {
     private QueryParser parser = SimpleQueryParser.DEFAULT;
+    private RouterBuilder builder = new RouterBuilder();
+
     private final List<Rule<T>> rules = new ArrayList<>();
 
     public RouterSetup<T> withParser(QueryParser parser) {
         this.parser = parser;
+        return this;
+    }
+
+    public RouterSetup<T> withBuilder(RouterBuilder builder) {
+        this.builder = builder;
         return this;
     }
 
@@ -39,10 +46,15 @@ public class RouterSetup<T> {
     }
 
     public Router<T> build() {
-        RouterBuilder.Node<T> root = RouterBuilder.buildNode(rules);
-        Map<CharBuffer, T> quickMatchIndex = RouterBuilder.buildQuickMatchIndex(rules);
-        return new Router<>(root, quickMatchIndex);
+        Map<CharBuffer, T> quickMatchIndex = builder.buildQuickMatchIndex(rules);
+        RouterBuilder.Node<T> root = builder.buildNode(rules);
+        return new Router<>(quickMatchIndex, root);
     }
 
-    record Rule<T>(Query query, T handler) {}
+    record Rule<T>(Query query, T handler) {
+        boolean isConstant() {
+            List<Token> tokens = query.tokens();
+            return tokens.size() == 1 && tokens.get(0) instanceof ConstToken;
+        }
+    }
 }

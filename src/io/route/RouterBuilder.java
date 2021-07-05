@@ -5,9 +5,26 @@ import io.route.util.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/*package*/ class RouterBuilder {
-    public static <T> Node<T> buildNode(List<RouterSetup.Rule<T>> rules) {
+public class RouterBuilder {
+    private boolean excludeConst = true;
+
+    public RouterBuilder setExcludeConst(boolean excludeConst) {
+        this.excludeConst = excludeConst;
+        return this;
+    }
+
+    public <T> Map<CharBuffer, T> buildQuickMatchIndex(List<RouterSetup.Rule<T>> rules) {
+        return rules.stream()
+                .filter(RouterSetup.Rule::isConstant)
+                .collect(Collectors.toMap(
+                        rule -> ((ConstToken) rule.query().tokens().get(0)).buffer(),
+                        RouterSetup.Rule::handler
+                ));
+    }
+
+    public <T> Node<T> buildNode(List<RouterSetup.Rule<T>> rules) {
         List<Sequence<T>> sequences = rules.stream()
+                .filter(rule -> !excludeConst || rule.isConstant())
                 .map(rule -> new Sequence<>(new LinkedList<>(rule.query().tokens()), rule))
                 .toList();
 
@@ -42,16 +59,6 @@ import java.util.stream.Collectors;
                 .toList();
         RouterSetup.Rule<T> terminalRule = sequences.size() == 1 ? sequences.get(0).rule : null;
         return new Node<>(start, nodes, terminalRule);
-    }
-
-    public static <T> Map<CharBuffer, T> buildQuickMatchIndex(List<RouterSetup.Rule<T>> rules) {
-        return rules.stream()
-                .filter(rule -> rule.query().tokens().size() == 1)
-                .filter(rule -> rule.query().tokens().get(0) instanceof ConstToken)
-                .collect(Collectors.toMap(
-                        rule -> ((ConstToken) rule.query().tokens().get(0)).buffer(),
-                        RouterSetup.Rule::handler
-                ));
     }
 
     private static class RootToken implements Token {
