@@ -124,10 +124,7 @@ public class CharBuffer implements CharSequence {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CharBuffer that = (CharBuffer) o;
-        return Arrays.equals(chars, start, end, that.chars, that.start, that.end);
+        return this == o || o instanceof CharBuffer that && Arrays.equals(chars, start, end, that.chars, that.start, that.end);
     }
 
     @Override

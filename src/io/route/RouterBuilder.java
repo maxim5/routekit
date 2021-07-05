@@ -5,7 +5,7 @@ import io.route.util.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RouterBuilder {
+/*package*/ class RouterBuilder {
     public static <T> Node<T> buildNode(List<RouterSetup.Rule<T>> rules) {
         List<Sequence<T>> sequences = rules.stream()
                 .map(rule -> new Sequence<>(new LinkedList<>(rule.query().tokens()), rule))

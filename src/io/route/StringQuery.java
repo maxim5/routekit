@@ -1,6 +1,7 @@
 package io.route;
 
 import java.util.List;
+import java.util.Objects;
 
 public class StringQuery implements Query {
     private final String query;
@@ -22,5 +23,15 @@ public class StringQuery implements Query {
     @Override
     public List<Token> tokens() {
         return tokens;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof StringQuery that && Objects.equals(query, that.query);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(query);
     }
 }

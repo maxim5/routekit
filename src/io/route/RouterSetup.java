@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RouterSetup<T> {
-    private QueryParser parser;
+    private QueryParser parser = SimpleQueryParser.DEFAULT;
     private final List<Rule<T>> rules = new ArrayList<>();
 
     public RouterSetup<T> withParser(QueryParser parser) {
@@ -15,12 +15,27 @@ public class RouterSetup<T> {
         return this;
     }
 
-    public void add(Query query, T handler) {
+    public RouterSetup<T> add(Query query, T handler) {
         rules.add(new Rule<>(query, handler));
+        return this;
     }
 
-    public void add(String query, T handler) {
-        add(new StringQuery(query, parser), handler);
+    public RouterSetup<T> add(String query, T handler) {
+        return add(new StringQuery(query, parser), handler);
+    }
+
+    public RouterSetup<T> addManyQueries(Map<Query, T> handlers) {
+        for (Map.Entry<Query, T> entry : handlers.entrySet()) {
+            add(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    public RouterSetup<T> addMany(Map<String, T> handlers) {
+        for (Map.Entry<String, T> entry : handlers.entrySet()) {
+            add(entry.getKey(), entry.getValue());
+        }
+        return this;
     }
 
     public Router<T> build() {
