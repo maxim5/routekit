@@ -117,14 +117,9 @@ public class CharBuffer implements CharSequence {
         return end - start;
     }
 
-    // Consider jdk.internal.util.ArraysSupport#mismatch(char[], char[], int)
     public int matchCommon(CharBuffer buf) {
-        int i = 0;
-        int limit = Math.min(length(), buf.length());
-        while (i < limit && chars[i + start] == buf.chars[i + buf.start]) {
-            i++;
-        }
-        return i;
+        int index = Arrays.mismatch(chars, start, end, buf.chars, buf.start, buf.end);
+        return (index >= 0) ? index : length();
     }
 
     @Override
