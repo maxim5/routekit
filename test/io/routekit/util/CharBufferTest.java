@@ -21,14 +21,15 @@ public class CharBufferTest {
     }
 
     @Test
-    public void equals() {
-        Assertions.assertEquals(new CharBuffer(""), new CharBuffer(""));
-        Assertions.assertEquals(new CharBuffer(""), new CharBuffer("foo", 0, 0));
-        Assertions.assertEquals(new CharBuffer(""), new CharBuffer("foo", 1, 1));
-        Assertions.assertEquals(new CharBuffer(""), new CharBuffer("foo", 2, 2));
-        Assertions.assertEquals(new CharBuffer(""), new CharBuffer("foo", 3, 3));
-        Assertions.assertEquals(new CharBuffer("foo"), new CharBuffer("foo"));
-        Assertions.assertEquals(new CharBuffer("foo"), new CharBuffer("foobar", 0, 3));
+    public void equals_and_hashCode() {
+        assertEqualsHashCode(new CharBuffer(""), new CharBuffer(""));
+        assertEqualsHashCode(new CharBuffer(""), new CharBuffer("foo", 0, 0));
+        assertEqualsHashCode(new CharBuffer(""), new CharBuffer("foo", 1, 1));
+        assertEqualsHashCode(new CharBuffer(""), new CharBuffer("foo", 2, 2));
+        assertEqualsHashCode(new CharBuffer(""), new CharBuffer("foo", 3, 3));
+        assertEqualsHashCode(new CharBuffer("foo"), new CharBuffer("foo"));
+        assertEqualsHashCode(new CharBuffer("foo"), new CharBuffer("foobar", 0, 3));
+        assertEqualsHashCode(new CharBuffer("foo"), new CharBuffer("barfoo", 3, 6));
     }
 
     @Test
@@ -116,5 +117,10 @@ public class CharBufferTest {
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("bar")));
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("!foo")));
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("barfoo")));
+    }
+
+    private static void assertEqualsHashCode(CharBuffer lhs, CharBuffer rhs) {
+        Assertions.assertEquals(lhs, rhs);
+        Assertions.assertEquals(lhs.hashCode(), rhs.hashCode());
     }
 }

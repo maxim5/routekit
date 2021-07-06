@@ -141,8 +141,10 @@ public class CharBuffer implements CharSequence {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(start, end);
-        result = 31 * result + Arrays.hashCode(chars);
+        int result = 1;
+        for (int i = start; i < end; ++i) {
+            result = 31 * result + chars[i];
+        }
         return result;
     }
 }
