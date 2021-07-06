@@ -52,6 +52,23 @@ public class RouterBuilder {
                 .findFirst()
                 .orElse(null);
 
+        extractCommonPrefix(sequences);
+
+        Map<Token, List<Sequence<T>>> group = new LinkedHashMap<>();  // preserve the order
+        for (Sequence<T> sequence : sequences) {
+            Token peek = sequence.tokens.poll();
+            group.computeIfAbsent(peek, key -> new ArrayList<>()).add(sequence);
+        }
+
+        @SuppressWarnings("unchecked")
+        Node<T>[] nodes = group.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .map(entry -> buildNode(entry.getKey(), entry.getValue()))
+                .toArray(Node[]::new);
+        return new Node<>(start, nodes, terminalRule);
+    }
+
+    private static <T> void extractCommonPrefix(List<Sequence<T>> sequences) {
         CharBuffer commonPrefix = sequences.stream()
                 .map(seq -> seq.tokens.peek() instanceof ConstToken constToken ? constToken.buffer() : null)
                 .reduce(null, (lhs, rhs) -> {
@@ -59,26 +76,18 @@ public class RouterBuilder {
                     if (rhs == null) return lhs;
                     return lhs.substringUntil(lhs.matchCommon(rhs));
                 });
-        Token commonToken = (commonPrefix != null && commonPrefix.isNotEmpty()) ? new ConstToken(commonPrefix) : null;
 
-        Map<Token, List<Sequence<T>>> group = new LinkedHashMap<>();  // preserve the order
-        for (Sequence<T> sequence : sequences) {
-            Token peek = sequence.tokens.poll();
-            if (commonToken != null && peek instanceof ConstToken constToken) {
-                if (!constToken.buffer().equals(commonPrefix)) {
+        if (commonPrefix != null && commonPrefix.isNotEmpty()) {
+            Token commonToken = new ConstToken(commonPrefix);
+            for (Sequence<T> sequence : sequences) {
+                Token peek = sequence.tokens.peek();
+                if (peek instanceof ConstToken constToken && !constToken.buffer().equals(commonPrefix)) {
+                    sequence.tokens.poll();
                     sequence.tokens.addFirst(new ConstToken(constToken.buffer().substringFrom(commonPrefix.length())));
+                    sequence.tokens.addFirst(commonToken);
                 }
-                group.computeIfAbsent(commonToken, __ -> new ArrayList<>()).add(sequence);
-            } else if (peek != null) {
-                group.computeIfAbsent(peek, __ -> new ArrayList<>()).add(sequence);
             }
         }
-
-        @SuppressWarnings("unchecked")
-        Node<T>[] nodes = group.entrySet().stream()
-                .map(entry -> buildNode(entry.getKey(), entry.getValue()))
-                .toArray(Node[]::new);
-        return new Node<>(start, nodes, terminalRule);
     }
 
     private static class RootToken implements Token {

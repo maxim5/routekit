@@ -33,14 +33,11 @@ public class ConstToken implements Token {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ConstToken that = (ConstToken) o;
-        return Objects.equals(token, that.token);
+        return this == o || o instanceof ConstToken that && Objects.equals(token, that.token);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token);
+        return token.hashCode();
     }
 }
