@@ -18,8 +18,8 @@ public class RouterBuilderTest {
         assertLines(printlnToString(node), """
         <root>
             ConstToken[/foo/ba]
-                ConstToken[z] -> 2
                 ConstToken[r] -> 1
+                ConstToken[z] -> 2
         """);
     }
 
@@ -35,9 +35,9 @@ public class RouterBuilderTest {
         assertLines(printlnToString(node), """
         <root>
             ConstToken[/] -> 1
-                ConstToken[bar] -> 4
                 ConstToken[foo/bar] -> 2
                 ConstToken[foo/bar/baz] -> 3
+                ConstToken[bar] -> 4
         """);
     }
 
@@ -89,6 +89,25 @@ public class RouterBuilderTest {
                 SeparableVariableToken[name] -> 1
                     ConstToken[/]
                         SeparableVariableToken[age] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_two_vars_and_wildcard() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        RouterBuilder.Node<String> node = builder.buildStateMachine(Arrays.asList(
+                rule("1", "/foo/", "{name}", "/default"),
+                rule("2", "/foo/", "{name}", "/", "{age}"),
+                rule("3", "/foo/", "{name}", "/", "{*rest}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/foo/]
+                SeparableVariableToken[name]
+                    ConstToken[/]
+                        ConstToken[default] -> 1
+                        SeparableVariableToken[age] -> 2
+                        SeparableVariableToken[*rest] -> 3
         """);
     }
 

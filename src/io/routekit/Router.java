@@ -39,7 +39,7 @@ public class Router<T> {
 
     private static <T> Match<T> navigate(CharBuffer input, RouterBuilder.Node<T> current) {
         MutableCharBuffer buffer = input.mutable();
-        Map<String, CharBuffer> vars = new LinkedHashMap<>();  // retain the order
+        Map<String, CharBuffer> vars = new LinkedHashMap<>();  // preserve the order
 
         while (buffer.isNotEmpty()) {
             int maxMatch = -1;

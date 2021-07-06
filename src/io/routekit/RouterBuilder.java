@@ -61,7 +61,7 @@ public class RouterBuilder {
                 });
         Token commonToken = (commonPrefix != null && commonPrefix.isNotEmpty()) ? new ConstToken(commonPrefix) : null;
 
-        Map<Token, List<Sequence<T>>> group = new HashMap<>();
+        Map<Token, List<Sequence<T>>> group = new LinkedHashMap<>();  // preserve the order
         for (Sequence<T> sequence : sequences) {
             Token peek = sequence.tokens.poll();
             if (commonToken != null && peek instanceof ConstToken constToken) {
