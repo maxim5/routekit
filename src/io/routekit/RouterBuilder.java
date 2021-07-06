@@ -21,7 +21,7 @@ public class RouterBuilder {
 
     public <T> Router<T> buildRouter(List<RouterSetup.Rule<T>> rules) {
         Map<CharBuffer, T> quickMatchIndex = buildQuickMatchIndex(rules);
-        RouterBuilder.Node<T> root = buildStateMachine(rules);
+        Router.Node<T> root = buildStateMachine(rules);
         return new Router<>(quickMatchIndex, root);
     }
 
@@ -36,7 +36,7 @@ public class RouterBuilder {
             Collections.emptyMap();
     }
 
-    /*package*/ <T> Node<T> buildStateMachine(List<RouterSetup.Rule<T>> rules) {
+    /*package*/ <T> Router.Node<T> buildStateMachine(List<RouterSetup.Rule<T>> rules) {
         List<Sequence<T>> sequences = rules.stream()
                 .filter(rule -> !excludeConstFromFSM || !rule.isConstant())
                 .map(rule -> new Sequence<>(new LinkedList<>(rule.query().tokens()), rule))
@@ -45,30 +45,36 @@ public class RouterBuilder {
         return buildNode(new RootToken(), sequences);
     }
 
-    private static <T> Node<T> buildNode(Token start, List<Sequence<T>> sequences) {
-        RouterSetup.Rule<T> terminalRule = sequences.stream()
+    private static <T> Router.Node<T> buildNode(Token start, List<Sequence<T>> sequences) {
+        RouterSetup.Rule<T> terminalRule = getTerminalRuleOrNull(sequences);
+        retokenizeWithCommonPrefix(sequences);
+        Router.Node<T>[] nodes = groupByPeekToken(sequences);
+        return new Router.Node<>(start, nodes, terminalRule);
+    }
+
+    private static <T> RouterSetup.Rule<T> getTerminalRuleOrNull(List<Sequence<T>> sequences) {
+        return sequences.stream()
                 .filter(seq -> seq.tokens.isEmpty())
                 .map(seq -> seq.rule)
                 .findFirst()
                 .orElse(null);
+    }
 
-        extractCommonPrefix(sequences);
-
+    private static <T> Router.Node<T>[] groupByPeekToken(List<Sequence<T>> sequences) {
         Map<Token, List<Sequence<T>>> group = new LinkedHashMap<>();  // preserve the order
         for (Sequence<T> sequence : sequences) {
             Token peek = sequence.tokens.poll();
             group.computeIfAbsent(peek, key -> new ArrayList<>()).add(sequence);
         }
 
-        @SuppressWarnings("unchecked")
-        Node<T>[] nodes = group.entrySet().stream()
+        // noinspection unchecked
+        return group.entrySet().stream()
                 .filter(entry -> entry.getKey() != null)
                 .map(entry -> buildNode(entry.getKey(), entry.getValue()))
-                .toArray(Node[]::new);
-        return new Node<>(start, nodes, terminalRule);
+                .toArray(Router.Node[]::new);
     }
 
-    private static <T> void extractCommonPrefix(List<Sequence<T>> sequences) {
+    private static <T> void retokenizeWithCommonPrefix(List<Sequence<T>> sequences) {
         CharBuffer commonPrefix = sequences.stream()
                 .map(seq -> seq.tokens.peek() instanceof ConstToken constToken ? constToken.buffer() : null)
                 .reduce(null, (lhs, rhs) -> {
@@ -103,14 +109,4 @@ public class RouterBuilder {
     }
 
     private record Sequence<T>(LinkedList<Token> tokens, RouterSetup.Rule<T> rule) {}
-
-    record Node<T>(Token token, Node<T>[] next, RouterSetup.Rule<T> terminalRule) {
-        public boolean isTerminal() {
-            return terminalRule != null;  // Note: non-leaf nodes can be terminal.
-        }
-
-        public boolean isLeaf() {
-            return next.length == 0;
-        }
-    }
 }

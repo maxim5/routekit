@@ -7,30 +7,30 @@ import java.nio.charset.Charset;
 public class NodePrinter {
     private static final int DEFAULT_TAB = 4;
 
-    public static <T> void println(RouterBuilder.Node<T> node) {
+    public static <T> void println(Router.Node<T> node) {
         println(node, DEFAULT_TAB);
     }
 
-    public static <T> void println(RouterBuilder.Node<T> node, int tab) {
+    public static <T> void println(Router.Node<T> node, int tab) {
         println(node, tab, System.out, 0);
     }
 
-    public static <T> String printlnToString(RouterBuilder.Node<T> node) {
+    public static <T> String printlnToString(Router.Node<T> node) {
         return printlnToString(node, DEFAULT_TAB);
     }
 
-    public static <T> String printlnToString(RouterBuilder.Node<T> node, int tab) {
+    public static <T> String printlnToString(Router.Node<T> node, int tab) {
         return printlnToString(node, tab, Charset.defaultCharset());
     }
 
-    public static <T> String printlnToString(RouterBuilder.Node<T> node, int tab, Charset charset) {
+    public static <T> String printlnToString(Router.Node<T> node, int tab, Charset charset) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(stream, false, charset);
         println(node, tab, printStream, 0);
         return stream.toString(charset);
     }
 
-    public static <T> void println(RouterBuilder.Node<T> node, int tab, PrintStream out, int indent) {
+    public static <T> void println(Router.Node<T> node, int tab, PrintStream out, int indent) {
         for (int i = 0; i < indent; i++) {
             out.print(' ');
         }
@@ -41,7 +41,7 @@ public class NodePrinter {
         }
         out.println();
 
-        for (RouterBuilder.Node<T> next : node.next()) {
+        for (Router.Node<T> next : node.next()) {
             println(next, tab, out, indent + tab);
         }
     }

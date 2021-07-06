@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class Router<T> {
     private final Map<CharBuffer, T> quickMatchIndex;
-    private final RouterBuilder.Node<T> root;
+    private final Node<T> root;
 
-    public Router(Map<CharBuffer, T> quickMatchIndex, RouterBuilder.Node<T> root) {
+    public Router(Map<CharBuffer, T> quickMatchIndex, Node<T> root) {
         this.quickMatchIndex = quickMatchIndex;
         this.root = root;
     }
@@ -37,15 +37,15 @@ public class Router<T> {
         return navigate(input, root);
     }
 
-    private static <T> Match<T> navigate(CharBuffer input, RouterBuilder.Node<T> current) {
+    private static <T> Match<T> navigate(CharBuffer input, Node<T> current) {
         MutableCharBuffer buffer = input.mutable();
         Map<String, CharBuffer> vars = new LinkedHashMap<>();  // preserve the order
 
         while (buffer.isNotEmpty()) {
             int maxMatch = -1;
-            RouterBuilder.Node<T> maxNode = null;
-            for (RouterBuilder.Node<T> next : current.next()) {  // No allocations: https://stackoverflow.com/a/3433775
-                int matchLength = next.token().match(buffer);
+            Node<T> maxNode = null;
+            for (Node<T> next : current.next) {  // No allocations: https://stackoverflow.com/a/3433775
+                int matchLength = next.token.match(buffer);
                 if (matchLength > maxMatch) {
                     maxMatch = matchLength;
                     maxNode = next;
@@ -54,7 +54,7 @@ public class Router<T> {
             if (maxNode == null) {
                 return null;  // no continuation found
             }
-            if (maxNode.token() instanceof Variable variable) {
+            if (maxNode.token instanceof Variable variable) {
                 vars.put(variable.name(), buffer.substringUntil(maxMatch));
             }
             buffer.offsetStart(maxMatch);
@@ -64,8 +64,18 @@ public class Router<T> {
         if (!current.isTerminal()) {
             return null;  // matches part of the rule
         }
-        return new Match<>(current.terminalRule().handler(), vars);
+        return new Match<>(current.terminalRule.handler(), vars);
     }
 
     record Match<T>(T handler, Map<String, CharBuffer> variables) {}
+
+    record Node<T>(Token token, Node<T>[] next, RouterSetup.Rule<T> terminalRule) {
+        public boolean isTerminal() {
+            return terminalRule != null;  // Note: non-leaf nodes can be terminal.
+        }
+
+        public boolean isLeaf() {
+            return next.length == 0;
+        }
+    }
 }
