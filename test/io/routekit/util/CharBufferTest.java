@@ -119,6 +119,32 @@ public class CharBufferTest {
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("barfoo")));
     }
 
+    @Test
+    public void join_same_buffer() {
+        CharBuffer buffer = new CharBuffer("foobar");
+        CharBuffer foo = buffer.substringUntil(3);
+        CharBuffer bar = buffer.substringFrom(3);
+        CharBuffer join = CharBuffer.join(foo, bar);
+
+        Assertions.assertSame(buffer.chars, foo.chars);
+        Assertions.assertSame(buffer.chars, bar.chars);
+        Assertions.assertSame(buffer.chars, join.chars);
+        Assertions.assertEquals(buffer, join);
+    }
+
+    @Test
+    public void join_not_same_buffer() {
+        CharBuffer buffer = new CharBuffer("foobar");
+        CharBuffer foo = new CharBuffer("foo");
+        CharBuffer bar = new CharBuffer("bar");
+        CharBuffer join = CharBuffer.join(foo, bar);
+
+        Assertions.assertNotSame(buffer.chars, foo.chars);
+        Assertions.assertNotSame(buffer.chars, bar.chars);
+        Assertions.assertNotSame(buffer.chars, join.chars);
+        Assertions.assertEquals(buffer, join);
+    }
+
     private static void assertEqualsHashCode(CharBuffer lhs, CharBuffer rhs) {
         Assertions.assertEquals(lhs, rhs);
         Assertions.assertEquals(lhs.hashCode(), rhs.hashCode());

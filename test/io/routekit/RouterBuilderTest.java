@@ -24,6 +24,31 @@ public class RouterBuilderTest {
     }
 
     @Test
+    public void buildStateMachine_constants_common_at_level_2() {
+        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
+        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+                rule("1", "/user/foo"),
+                rule("2", "/user/bar"),
+                rule("3", "/usergroup/"),
+                rule("4", "/usergroup/baz"),
+                rule("5", "/search/foo"),
+                rule("6", "/search/bar")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/]
+                ConstToken[user/]
+                    ConstToken[foo] -> 1
+                    ConstToken[bar] -> 2
+                ConstToken[usergroup/] -> 3
+                    ConstToken[baz] -> 4
+                ConstToken[search/]
+                    ConstToken[foo] -> 5
+                    ConstToken[bar] -> 6
+        """);
+    }
+
+    @Test
     public void buildStateMachine_constants_height_2() {
         RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
         Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
@@ -36,7 +61,7 @@ public class RouterBuilderTest {
         <root>
             ConstToken[/] -> 1
                 ConstToken[foo/bar] -> 2
-                ConstToken[foo/bar/baz] -> 3
+                    ConstToken[/baz] -> 3
                 ConstToken[bar] -> 4
         """);
     }

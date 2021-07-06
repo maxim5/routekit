@@ -129,6 +129,13 @@ public class CharBuffer implements CharSequence {
         return (index >= 0) ? index : length();
     }
 
+    public static CharBuffer join(CharBuffer lhs, CharBuffer rhs) {
+        if (lhs.chars == rhs.chars && lhs.end == rhs.start) {
+            return new CharBuffer(lhs.chars, lhs.start, rhs.end);
+        }
+        return new CharBuffer(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
+    }
+
     @Override
     public String toString() {
         return new String(chars, start, end - start);

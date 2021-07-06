@@ -6,8 +6,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RouterBuilder {
+    public static final char DEFAULT_SEPARATOR = '/';
+
     private boolean quickMatchForConst = true;
     private boolean excludeConstFromFSM = true;
+    private char separator = DEFAULT_SEPARATOR;
+    private int minCommonPrefixLength = 1;
 
     public RouterBuilder setQuickMatchForConst(boolean quickMatchForConst) {
         this.quickMatchForConst = quickMatchForConst;
@@ -16,6 +20,16 @@ public class RouterBuilder {
 
     public RouterBuilder setExcludeConstFromFSM(boolean excludeConstFromFSM) {
         this.excludeConstFromFSM = excludeConstFromFSM;
+        return this;
+    }
+
+    public RouterBuilder setSeparator(char separator) {
+        this.separator = separator;
+        return this;
+    }
+
+    public RouterBuilder setMinCommonPrefixLength(int minCommonPrefixLength) {
+        this.minCommonPrefixLength = minCommonPrefixLength;
         return this;
     }
 
@@ -45,11 +59,16 @@ public class RouterBuilder {
         return buildNode(new RootToken(), sequences);
     }
 
-    private static <T> Router.Node<T> buildNode(Token start, List<Sequence<T>> sequences) {
+    private <T> Router.Node<T> buildNode(Token start, List<Sequence<T>> sequences) {
         RouterSetup.Rule<T> terminalRule = getTerminalRuleOrNull(sequences);
-        retokenizeWithCommonPrefix(sequences);
-        Router.Node<T>[] nodes = groupByPeekToken(sequences);
-        return new Router.Node<>(start, nodes, terminalRule);
+        if (!retokenizeByCommonPrefix(sequences)) {
+            retokenizeBySeparator(sequences);
+        }
+        List<Router.Node<T>> nodes = groupByPeekToken(sequences);  // recursion here
+        List<Router.Node<T>> compact = compactJoinableNodes(nodes);
+        @SuppressWarnings("unchecked")
+        Router.Node<T>[] array = compact.toArray(Router.Node[]::new);
+        return new Router.Node<>(start, array, terminalRule);
     }
 
     private static <T> RouterSetup.Rule<T> getTerminalRuleOrNull(List<Sequence<T>> sequences) {
@@ -60,21 +79,20 @@ public class RouterBuilder {
                 .orElse(null);
     }
 
-    private static <T> Router.Node<T>[] groupByPeekToken(List<Sequence<T>> sequences) {
+    private <T> List<Router.Node<T>> groupByPeekToken(List<Sequence<T>> sequences) {
         Map<Token, List<Sequence<T>>> group = new LinkedHashMap<>();  // preserve the order
         for (Sequence<T> sequence : sequences) {
             Token peek = sequence.tokens.poll();
             group.computeIfAbsent(peek, key -> new ArrayList<>()).add(sequence);
         }
 
-        // noinspection unchecked
         return group.entrySet().stream()
                 .filter(entry -> entry.getKey() != null)
-                .map(entry -> buildNode(entry.getKey(), entry.getValue()))
-                .toArray(Router.Node[]::new);
+                .map(entry -> buildNode(entry.getKey(), entry.getValue()))  // recursion
+                .toList();
     }
 
-    private static <T> void retokenizeWithCommonPrefix(List<Sequence<T>> sequences) {
+    private <T> boolean retokenizeByCommonPrefix(List<Sequence<T>> sequences) {
         CharBuffer commonPrefix = sequences.stream()
                 .map(seq -> seq.tokens.peek() instanceof ConstToken constToken ? constToken.buffer() : null)
                 .reduce(null, (lhs, rhs) -> {
@@ -83,7 +101,7 @@ public class RouterBuilder {
                     return lhs.substringUntil(lhs.matchCommon(rhs));
                 });
 
-        if (commonPrefix != null && commonPrefix.isNotEmpty()) {
+        if (commonPrefix != null && commonPrefix.isNotEmpty() && commonPrefix.length() >= minCommonPrefixLength) {
             Token commonToken = new ConstToken(commonPrefix);
             for (Sequence<T> sequence : sequences) {
                 Token peek = sequence.tokens.peek();
@@ -93,7 +111,38 @@ public class RouterBuilder {
                     sequence.tokens.addFirst(commonToken);
                 }
             }
+            return true;
         }
+
+        return false;
+    }
+
+    private <T> void retokenizeBySeparator(List<Sequence<T>> sequences) {
+        sequences.stream()
+                .filter(seq -> seq.tokens.peek() instanceof ConstToken)
+                .forEach(sequence -> {
+                    CharBuffer buffer = ((ConstToken) sequence.tokens.peek()).buffer();
+                    int index = buffer.matchUntil(1, separator);
+                    if (index < buffer.length()) {
+                        sequence.tokens.poll();
+                        sequence.tokens.addFirst(new ConstToken(buffer.substringFrom(index)));
+                        sequence.tokens.addFirst(new ConstToken(buffer.substringUntil(index)));
+                    }
+                });
+    }
+
+    private static <T> List<Router.Node<T>> compactJoinableNodes(List<Router.Node<T>> nodes) {
+        return nodes.stream().map(node -> {
+            if (node.next().length != 1 || node.isTerminal()) {
+                return node;
+            }
+            Router.Node<T> child = node.next()[0];
+            if (node.token() instanceof ConstToken lhs && child.token() instanceof ConstToken rhs) {
+                CharBuffer join = CharBuffer.join(lhs.buffer(), rhs.buffer());
+                return new Router.Node<>(new ConstToken(join), child.next(), child.terminalRule());
+            }
+            return node;
+        }).toList();
     }
 
     private static class RootToken implements Token {
