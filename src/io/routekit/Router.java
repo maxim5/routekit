@@ -73,9 +73,5 @@ public class Router<T> {
         public boolean isTerminal() {
             return terminalRule != null;  // Note: non-leaf nodes can be terminal.
         }
-
-        public boolean isLeaf() {
-            return next.length == 0;
-        }
     }
 }
