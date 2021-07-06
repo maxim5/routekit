@@ -2,6 +2,7 @@ package io.routekit.util;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.IntConsumer;
 
 /**
  *
@@ -67,6 +68,12 @@ public class CharBuffer implements CharSequence {
 
     public int at(int index) {
         return index < length() ? chars[start + index] : -1;
+    }
+
+    public void forEach(IntConsumer consumer) {
+        for (int i = start; i < end; ++i) {
+            consumer.accept(chars[i]);
+        }
     }
 
     public CharBuffer substringFrom(int start) {

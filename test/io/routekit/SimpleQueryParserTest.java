@@ -88,11 +88,12 @@ public class SimpleQueryParserTest {
 
         // Invalid brackets
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{"));
-        // Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}foo{"));
-        // Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{foo}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{foo}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("}{}{"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{{}}"));  // nesting not allowed
 
         // Invalid name
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{}"));
@@ -102,6 +103,8 @@ public class SimpleQueryParserTest {
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo*foo}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{*foo*}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{{foo}}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo-bar}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo+bar}"));
 
         // Duplicates
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{dup}{dup}"));
