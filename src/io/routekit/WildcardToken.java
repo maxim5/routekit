@@ -11,4 +11,9 @@ public class WildcardToken extends Variable implements Token {
     public int match(CharBuffer buffer) {
         return buffer.length();
     }
+
+    @Override
+    public String toString() {
+        return "WildcardToken[" + name() + "]";
+    }
 }

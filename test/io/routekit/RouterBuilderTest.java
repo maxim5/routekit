@@ -132,7 +132,7 @@ public class RouterBuilderTest {
                     ConstToken[/]
                         ConstToken[default] -> 1
                         SeparableVariableToken[age] -> 2
-                        SeparableVariableToken[*rest] -> 3
+                        WildcardToken[rest] -> 3
         """);
     }
 
@@ -142,7 +142,9 @@ public class RouterBuilderTest {
 
     private static Token convert(String token) {
         return token.startsWith("{") && token.endsWith("}") ?
-                new SeparableVariableToken(token.replaceAll("[{}]", "")) :
+                token.contains("*") ?
+                    new WildcardToken(token.replaceAll("[{}*]", "")) :
+                    new SeparableVariableToken(token.replaceAll("[{}*]", "")) :
                 new ConstToken(token);
     }
 
