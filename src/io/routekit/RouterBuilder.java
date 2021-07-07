@@ -72,11 +72,14 @@ public class RouterBuilder {
     }
 
     private static <T> RouterSetup.Rule<T> getTerminalRuleOrNull(List<Sequence<T>> sequences) {
-        return sequences.stream()
+        List<RouterSetup.Rule<T>> terminal = sequences.stream()
                 .filter(seq -> seq.tokens.isEmpty())
-                .map(seq -> seq.rule)
-                .findFirst()
-                .orElse(null);
+                .map(Sequence::rule)
+                .toList();
+        if (terminal.size() > 1) {
+            throw new RuntimeException("Duplicate rules found: " + terminal.stream().map(RouterSetup.Rule::query).toList());
+        }
+        return terminal.stream().findFirst().orElse(null);
     }
 
     private <T> List<Router.Node<T>> groupByPeekToken(List<Sequence<T>> sequences) {

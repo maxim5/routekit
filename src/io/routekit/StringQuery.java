@@ -26,12 +26,17 @@ public class StringQuery implements Query {
     }
 
     @Override
+    public String toString() {
+        return query;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return this == o || o instanceof StringQuery that && Objects.equals(query, that.query);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(query);
+        return query.hashCode();
     }
 }
