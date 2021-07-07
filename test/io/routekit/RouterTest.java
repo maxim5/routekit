@@ -120,7 +120,7 @@ public class RouterTest {
         assert404(router.routeOrNull("foo//"));
         assert404(router.routeOrNull("/foo/foo/"));
         assert404(router.routeOrNull("/foo/foo/baz"));
-        // assert404(router.routeOrNull("/foo//bar"));  // TODO: fix
+        assert404(router.routeOrNull("/foo//bar"));
         assert404(router.routeOrNull("/"));
         assert404(router.routeOrNull("//"));
         assert404(router.routeOrNull("foo/"));
@@ -248,8 +248,8 @@ public class RouterTest {
 
         // Not found
         assert404(router.routeOrNull("/post/"));
-        // assert404(router.routeOrNull("/post//"));  // TODO: fix empty var match
-        // assert404(router.routeOrNull("/post///"));  // TODO: fix empty var match
+        assert404(router.routeOrNull("/post//"));
+        assert404(router.routeOrNull("/post///"));
     }
 
     @Test

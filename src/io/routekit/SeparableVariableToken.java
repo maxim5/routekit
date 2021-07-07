@@ -16,7 +16,7 @@ public class SeparableVariableToken extends Variable implements Token {
 
     @Override
     public int match(CharBuffer buffer) {
-        return buffer.matchUntil(separator);
+        return handleEmptyMatch(buffer.matchUntil(separator));
     }
 
     @Override

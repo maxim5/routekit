@@ -9,7 +9,7 @@ public class WildcardToken extends Variable implements Token {
 
     @Override
     public int match(CharBuffer buffer) {
-        return buffer.length();
+        return handleEmptyMatch(buffer.length());
     }
 
     @Override
