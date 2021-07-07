@@ -248,6 +248,47 @@ public class RouterBuilderTest {
     }
 
     @Test
+    public void buildStateMachine_const_and_var() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/user"),
+                rule("2", "/user/id", "{id}"),
+                rule("2", "/user/", "{name}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/user] -> 1
+                ConstToken[/]
+                    ConstToken[id]
+                        SeparableVariableToken[id] -> 2
+                    SeparableVariableToken[name] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_const_and_var_tree() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/"),
+                rule("2", "/index"),
+                rule("3", "/index/", "{page}"),
+                rule("4", "/user"),
+                rule("5", "/user/", "{name}"),
+                rule("6", "/user/id", "{id}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/] -> 1
+                ConstToken[index] -> 2
+                    ConstToken[/]
+                        SeparableVariableToken[page] -> 3
+                ConstToken[user] -> 4
+                    ConstToken[/]
+                        SeparableVariableToken[name] -> 5
+                        ConstToken[id]
+                            SeparableVariableToken[id] -> 6
+        """);
+    }
+
+    @Test
     public void buildStateMachine_vars_common_prefix() {
         Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/", "{name}"),
