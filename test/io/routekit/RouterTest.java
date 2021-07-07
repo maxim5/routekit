@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RouterTest {
+    // Trivial cases
+
     @Test
     public void routeOrNull_const_rules_no_prefix() {
         Router<String> router = new RouterSetup<String>()
@@ -64,6 +66,23 @@ public class RouterTest {
     }
 
     @Test
+    public void routeOrNull_just_wildcard_rule() {
+        Router<String> router = new RouterSetup<String>()
+                .add("{*var}", "1")
+                .build();
+
+        assertOK(router.routeOrNull("foo"), "1", "var=foo");
+        assertOK(router.routeOrNull("FOO"), "1", "var=FOO");
+        assertOK(router.routeOrNull("foo/"), "1", "var=foo/");
+        assertOK(router.routeOrNull("foo/bar"), "1", "var=foo/bar");
+        assertOK(router.routeOrNull("/"), "1", "var=/");
+        assertOK(router.routeOrNull("/foo"), "1", "var=/foo");
+        assertOK(router.routeOrNull("_"), "1", "var=_");
+
+        assert404(router.routeOrNull(""));
+    }
+
+    @Test
     public void routeOrNull_const_variable_rule() {
         Router<String> router = new RouterSetup<String>()
                 .add("/foo/{var}", "1")
@@ -85,6 +104,54 @@ public class RouterTest {
         assert404(router.routeOrNull("foo/bar/"));
         assert404(router.routeOrNull("foo/bar//"));
     }
+
+    @Test
+    public void routeOrNull_const_variable_const_rule() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/{var}/bar", "1")
+                .build();
+
+        assertOK(router.routeOrNull("/foo/foo/bar"), "1", "var=foo");
+        assertOK(router.routeOrNull("/foo/FOO/bar"), "1", "var=FOO");
+        assertOK(router.routeOrNull("/foo/_/bar"), "1", "var=_");
+
+        // Not found
+        assert404(router.routeOrNull("/foo/"));
+        assert404(router.routeOrNull("foo//"));
+        assert404(router.routeOrNull("/foo/foo/"));
+        assert404(router.routeOrNull("/foo/foo/baz"));
+        // assert404(router.routeOrNull("/foo//bar"));  // TODO: fix
+        assert404(router.routeOrNull("/"));
+        assert404(router.routeOrNull("//"));
+        assert404(router.routeOrNull("foo/"));
+        assert404(router.routeOrNull("/foobar"));
+    }
+
+    @Test
+    public void routeOrNull_const_wildcard_rule() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/{*var}", "1")
+                .build();
+
+        assertOK(router.routeOrNull("/foo/foo"), "1", "var=foo");
+        assertOK(router.routeOrNull("/foo/FOO"), "1", "var=FOO");
+        assertOK(router.routeOrNull("/foo/bar/"), "1", "var=bar/");
+        assertOK(router.routeOrNull("/foo/bar//"), "1", "var=bar//");
+        assertOK(router.routeOrNull("/foo/bar/baz"), "1", "var=bar/baz");
+        assertOK(router.routeOrNull("/foo//"), "1", "var=/");
+        assertOK(router.routeOrNull("/foo/_"), "1", "var=_");
+
+        // Not found
+        assert404(router.routeOrNull("/foo/"));
+        assert404(router.routeOrNull("/"));
+        assert404(router.routeOrNull("//"));
+        assert404(router.routeOrNull("foo/"));
+        assert404(router.routeOrNull("foo/bar"));
+        assert404(router.routeOrNull("foo/bar/"));
+        assert404(router.routeOrNull("/foobar"));
+    }
+
+    // Multiple rules
 
     @Test
     public void routeOrNull_variables_with_same_prefix_unreachable() {
@@ -119,23 +186,25 @@ public class RouterTest {
 
         assertOK(router.routeOrNull("/user/foo"), "1", "name=foo");
         assertOK(router.routeOrNull("/user/_"), "1", "name=_");
-        assertOK(router.routeOrNull("/user/id3"), "1", "name=id3");  // longer match selected
+        assertOK(router.routeOrNull("/user/id"), "1", "name=id");  // the only terminal
+        assertOK(router.routeOrNull("/user/id3"), "1", "name=id3");  // longest match selected
 
         // Not found
         assert404(router.routeOrNull("/user/"));
         assert404(router.routeOrNull("/user/foo/"));
+        assert404(router.routeOrNull("/user/id/"));
     }
 
     @Test
-    public void routeOrNull_variables_with_same_part_swap_unreachable() {
+    public void routeOrNull_variables_with_same_part_swapped_unreachable() {
         Router<String> router = new RouterSetup<String>()
-                .add("/user/id{id}", "2")  // reachable
+                .add("/user/id{id}", "2")  // unreachable
                 .add("/user/{name}", "1")
                 .build();
 
         assertOK(router.routeOrNull("/user/foo"), "1", "name=foo");
         assertOK(router.routeOrNull("/user/_"), "1", "name=_");
-        assertOK(router.routeOrNull("/user/id3"), "1", "name=id3");  // longer match selected
+        assertOK(router.routeOrNull("/user/id3"), "1", "name=id3");  // longest match selected
 
         // Not found
         assert404(router.routeOrNull("/user/"));
@@ -164,68 +233,27 @@ public class RouterTest {
     }
 
     @Test
-    public void routeOrNull_just_const_and_just_variable_rules() {
+    public void routeOrNull_optional_variables_defined_as_hierarchy() {
         Router<String> router = new RouterSetup<String>()
-                .add("/foo", "1")
-                .add("/{var}", "2")
+                .add("/post/{id}", "1")
+                .add("/post/{id}/", "2")
+                .add("/post/{id}/{slug}", "3")
+                .add("/post/{id}/{slug}/{ref}", "4")
                 .build();
 
-        assertOK(router.routeOrNull("/foo"), "1");
-        assertOK(router.routeOrNull("/bar"), "2", "var=bar");
-        assertOK(router.routeOrNull("/foobar"), "2", "var=foobar");
+        assertOK(router.routeOrNull("/post/1"), "1", "id=1");
+        assertOK(router.routeOrNull("/post/1/"), "2", "id=1");
+        assertOK(router.routeOrNull("/post/1/title"), "3", "id=1", "slug=title");
+        assertOK(router.routeOrNull("/post/1/title/42"), "4", "id=1", "slug=title", "ref=42");
 
         // Not found
-        assert404(router.routeOrNull("/foo/"));
-        assert404(router.routeOrNull("/"));
-        assert404(router.routeOrNull("//"));
-        assert404(router.routeOrNull("foo"));
-        assert404(router.routeOrNull("foo/"));
-
-        // Doesn't match the slash
-        assert404(router.routeOrNull("/foo/"));
+        assert404(router.routeOrNull("/post/"));
+        // assert404(router.routeOrNull("/post//"));  // TODO: fix empty var match
+        // assert404(router.routeOrNull("/post///"));  // TODO: fix empty var match
     }
 
     @Test
-    public void routeOrNull_just_wildcard_rule() {
-        Router<String> router = new RouterSetup<String>()
-                .add("{*var}", "1")
-                .build();
-
-        assertOK(router.routeOrNull("foo"), "1", "var=foo");
-        assertOK(router.routeOrNull("FOO"), "1", "var=FOO");
-        assertOK(router.routeOrNull("foo/bar"), "1", "var=foo/bar");
-        assertOK(router.routeOrNull("/"), "1", "var=/");
-        assertOK(router.routeOrNull("_"), "1", "var=_");
-
-        assert404(router.routeOrNull(""));
-    }
-
-    @Test
-    public void routeOrNull_const_wildcard_rule() {
-        Router<String> router = new RouterSetup<String>()
-                .add("/foo/{*var}", "1")
-                .build();
-
-        assertOK(router.routeOrNull("/foo/foo"), "1", "var=foo");
-        assertOK(router.routeOrNull("/foo/FOO"), "1", "var=FOO");
-        assertOK(router.routeOrNull("/foo/bar/"), "1", "var=bar/");
-        assertOK(router.routeOrNull("/foo/bar//"), "1", "var=bar//");
-        assertOK(router.routeOrNull("/foo/bar/baz"), "1", "var=bar/baz");
-        assertOK(router.routeOrNull("/foo//"), "1", "var=/");
-        assertOK(router.routeOrNull("/foo/_"), "1", "var=_");
-
-        // Not found
-        assert404(router.routeOrNull("/foo/"));
-        assert404(router.routeOrNull("/"));
-        assert404(router.routeOrNull("//"));
-        assert404(router.routeOrNull("foo/"));
-        assert404(router.routeOrNull("foo/bar"));
-        assert404(router.routeOrNull("foo/bar/"));
-        assert404(router.routeOrNull("/foobar"));
-    }
-
-    @Test
-    public void routeOrNull_const_and_two_vars() {
+    public void routeOrNull_optional_variables_defined_as_hierarchy_with_defaults() {
         Router<String> router = new RouterSetup<String>()
                 .add("/foo/bar", "1")
                 .add("/foo/{name}", "2")
@@ -253,6 +281,50 @@ public class RouterTest {
     }
 
     @Test
+    public void routeOrNull_just_const_and_just_variable_rules() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo", "1")
+                .add("/{var}", "2")
+                .build();
+
+        assertOK(router.routeOrNull("/foo"), "1");
+        assertOK(router.routeOrNull("/bar"), "2", "var=bar");
+        assertOK(router.routeOrNull("/foobar"), "2", "var=foobar");
+
+        // Not found
+        assert404(router.routeOrNull("/foo/"));
+        assert404(router.routeOrNull("/"));
+        assert404(router.routeOrNull("//"));
+        assert404(router.routeOrNull("foo"));
+        assert404(router.routeOrNull("foo/"));
+
+        // Doesn't match the slash
+        assert404(router.routeOrNull("/foo/"));
+    }
+
+    @Test
+    public void routeOrNull_just_const_and_just_variable_rules_swapped() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/{var}", "2")
+                .add("/foo", "1")
+                .build();
+
+        assertOK(router.routeOrNull("/foo"), "1");
+        assertOK(router.routeOrNull("/bar"), "2", "var=bar");
+        assertOK(router.routeOrNull("/foobar"), "2", "var=foobar");
+
+        // Not found
+        assert404(router.routeOrNull("/foo/"));
+        assert404(router.routeOrNull("/"));
+        assert404(router.routeOrNull("//"));
+        assert404(router.routeOrNull("foo"));
+        assert404(router.routeOrNull("foo/"));
+
+        // Doesn't match the slash
+        assert404(router.routeOrNull("/foo/"));
+    }
+
+    @Test
     public void routeOrNull_two_rules_two_vars_all_matching() {
         Router<String> router = new RouterSetup<String>()
                 .add("/foo/{name}/default", "1")
@@ -263,6 +335,20 @@ public class RouterTest {
         assertOK(router.routeOrNull("/foo/bar/25"), "2", "name=bar", "age=25");
         assertOK(router.routeOrNull("/foo/bar/def"), "2", "name=bar", "age=def");
         assertOK(router.routeOrNull("/foo/bar/default"), "1", "name=bar");
+        assertOK(router.routeOrNull("/foo/bar/default25"), "2", "name=bar", "age=default25");
+    }
+
+    @Test
+    public void routeOrNull_two_rules_two_vars_all_matching_swapped() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/{name}/{age}", "2")
+                .add("/foo/{name}/default", "1")
+                .build();
+
+        assertOK(router.routeOrNull("/foo/bar/1"), "2", "name=bar", "age=1");
+        assertOK(router.routeOrNull("/foo/bar/25"), "2", "name=bar", "age=25");
+        assertOK(router.routeOrNull("/foo/bar/def"), "2", "name=bar", "age=def");
+        // assertOK(router.routeOrNull("/foo/bar/default"), "1", "name=bar");  // TODO: fix with priorities
         assertOK(router.routeOrNull("/foo/bar/default25"), "2", "name=bar", "age=default25");
     }
 
