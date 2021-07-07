@@ -7,11 +7,12 @@ import java.util.stream.Collectors;
 
 public class RouterBuilder {
     public static final char DEFAULT_SEPARATOR = '/';
+    public static final int DEFAULT_MIN_COMMON_PREFIX = 1;
 
     private boolean quickMatchForConst = true;
     private boolean excludeConstFromFSM = true;
     private char separator = DEFAULT_SEPARATOR;
-    private int minCommonPrefixLength = 1;
+    private int minCommonPrefixLength = DEFAULT_MIN_COMMON_PREFIX;
 
     public RouterBuilder setQuickMatchForConst(boolean quickMatchForConst) {
         this.quickMatchForConst = quickMatchForConst;
