@@ -10,8 +10,7 @@ import static io.routekit.NodePrinter.printlnToString;
 public class RouterBuilderTest {
     @Test
     public void buildStateMachine_constants_common_part() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/baz")
         ));
@@ -24,9 +23,87 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateMachine_constants_common_at_level_2() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+    public void buildStateMachine_constants_no_common_part() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "foo"),
+                rule("2", "bar"),
+                rule("3", "baz")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[foo] -> 1
+            ConstToken[bar] -> 2
+            ConstToken[baz] -> 3
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_common_prefix() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/foobar"),
+                rule("2", "/foobaz")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/fooba]
+                ConstToken[r] -> 1
+                ConstToken[z] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_two_common_prefixes_in_parallel() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/foobar"),
+                rule("2", "/foobaz"),
+                rule("3", "/bar"),
+                rule("4", "/barbaz")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/]
+                ConstToken[foobar] -> 1
+                ConstToken[foobaz] -> 2
+                ConstToken[bar] -> 3
+                ConstToken[barbaz] -> 4
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_simple_hierarchy() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/"),
+                rule("2", "/foo"),
+                rule("3", "/foo/"),
+                rule("4", "/foo/bar")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/] -> 1
+                ConstToken[foo] -> 2
+                    ConstToken[/] -> 3
+                        ConstToken[bar] -> 4
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_hierarchy_parts_joined() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/"),
+                rule("2", "/foo/foo"),
+                rule("3", "/foo/foo/bar/bar")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/] -> 1
+                ConstToken[foo/foo] -> 2
+                    ConstToken[/bar/bar] -> 3
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_common_at_second_level() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/user/foo"),
                 rule("2", "/user/bar"),
                 rule("3", "/usergroup/"),
@@ -49,9 +126,8 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateMachine_constants_height_2() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+    public void buildStateMachine_constants_hierarchy_with_sibling() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/"),
                 rule("2", "/foo/bar"),
                 rule("3", "/foo/bar/baz"),
@@ -67,9 +143,80 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateMachine_const_excluded_and_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+    public void buildStateMachine_constants_two_hierarchies() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/"),
+                rule("2", "/foo/bar"),
+                rule("3", "/foo/bar/baz"),
+                rule("4", "/bar"),
+                rule("5", "/bar/baz")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/] -> 1
+                ConstToken[foo/bar] -> 2
+                    ConstToken[/baz] -> 3
+                ConstToken[bar] -> 4
+                    ConstToken[/baz] -> 5
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_variables_no_common_part() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "{foo}"),
+                rule("2", "{bar}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            SeparableVariableToken[foo] -> 1
+            SeparableVariableToken[bar] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_variables_with_common_part() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/foo/", "{foo}"),
+                rule("2", "/foo/", "{bar}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/foo/]
+                SeparableVariableToken[foo] -> 1
+                SeparableVariableToken[bar] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_variables_hierarchy() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "{foo}"),
+                rule("2", "{foo}", "{bar}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            SeparableVariableToken[foo] -> 1
+                SeparableVariableToken[bar] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_const_and_var_no_duplicate() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "foo"),
+                rule("2", "{foo}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[foo] -> 1
+            SeparableVariableToken[foo] -> 2
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_const_excluded_and_vars_with_common_prefix() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/", "{name}"),
                 rule("3", "/foo/", "{name}", "/", "{age}")
@@ -85,9 +232,8 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateMachine_const_included_and_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(true);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+    public void buildStateMachine_const_included_and_vars_with_common_prefix() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(true).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/bar"),
                 rule("2", "/foo/", "{name}"),
                 rule("3", "/foo/", "{name}", "/", "{age}")
@@ -103,8 +249,7 @@ public class RouterBuilderTest {
 
     @Test
     public void buildStateMachine_vars_common_prefix() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/", "{name}"),
                 rule("2", "/foo/", "{name}", "/", "{age}")
         ));
@@ -119,8 +264,7 @@ public class RouterBuilderTest {
 
     @Test
     public void buildStateMachine_two_vars_and_wildcard() {
-        RouterBuilder builder = new RouterBuilder().setExcludeConstFromFSM(false);
-        Router.Node<String> node = builder.buildStateMachine(Arrays.asList(
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/", "{name}", "/default"),
                 rule("2", "/foo/", "{name}", "/", "{age}"),
                 rule("3", "/foo/", "{name}", "/", "{*rest}")
@@ -134,6 +278,33 @@ public class RouterBuilderTest {
                         SeparableVariableToken[age] -> 2
                         WildcardToken[rest] -> 3
         """);
+    }
+
+    @Test
+    public void buildStateMachine_constants_duplicates() {
+        Assertions.assertThrows(RuntimeException.class,
+                () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                        rule("1", "/foo"),
+                        rule("2", "/foo")
+        )));
+    }
+
+    @Test
+    public void buildStateMachine_vars_duplicates() {
+        Assertions.assertThrows(RuntimeException.class,
+                () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                        rule("1", "/", "{var}"),
+                        rule("2", "/", "{var}")
+                )));
+    }
+
+    @Test
+    public void buildStateMachine_var_and_wildcard_duplicates() {
+        Assertions.assertThrows(RuntimeException.class,
+                () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                        rule("1", "/", "{var}"),
+                        rule("2", "/", "{*var}")
+                )));
     }
 
     private static RouterSetup.Rule<String> rule(String tag, String ... tokens) {
