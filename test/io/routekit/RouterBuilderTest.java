@@ -304,7 +304,7 @@ public class RouterBuilderTest {
     }
 
     @Test
-    public void buildStateMachine_two_vars_and_wildcard() {
+    public void buildStateMachine_var_const_and_wildcard_on_same_level() {
         Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                 rule("1", "/foo/", "{name}", "/default"),
                 rule("2", "/foo/", "{name}", "/", "{age}"),
@@ -318,6 +318,23 @@ public class RouterBuilderTest {
                         ConstToken[default] -> 1
                         SeparableVariableToken[age] -> 2
                         WildcardToken[rest] -> 3
+        """);
+    }
+
+    @Test
+    public void buildStateMachine_optional_trailing_wildcard() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
+                rule("1", "/foo"),
+                rule("2", "/foo/", "{name}"),
+                rule("3", "/foo/", "{name}", "/", "{*rest}")
+        ));
+        assertLines(printlnToString(node), """
+        <root>
+            ConstToken[/foo] -> 1
+                ConstToken[/]
+                    SeparableVariableToken[name] -> 2
+                        ConstToken[/]
+                            WildcardToken[rest] -> 3
         """);
     }
 
