@@ -340,7 +340,7 @@ public class RouterBuilderTest {
 
     @Test
     public void buildStateMachine_constants_duplicates() {
-        Assertions.assertThrows(RuntimeException.class,
+        Assertions.assertThrows(RouteException.class,
                 () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                         rule("1", "/foo"),
                         rule("2", "/foo")
@@ -349,7 +349,7 @@ public class RouterBuilderTest {
 
     @Test
     public void buildStateMachine_vars_duplicates() {
-        Assertions.assertThrows(RuntimeException.class,
+        Assertions.assertThrows(RouteException.class,
                 () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                         rule("1", "/", "{var}"),
                         rule("2", "/", "{var}")
@@ -358,7 +358,7 @@ public class RouterBuilderTest {
 
     @Test
     public void buildStateMachine_var_and_wildcard_duplicates() {
-        Assertions.assertThrows(RuntimeException.class,
+        Assertions.assertThrows(RouteException.class,
                 () -> new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
                         rule("1", "/", "{var}"),
                         rule("2", "/", "{*var}")

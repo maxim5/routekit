@@ -1,9 +1,6 @@
 package io.routekit;
 
-public class QueryParseException extends RuntimeException {
-    public QueryParseException() {
-    }
-
+public class QueryParseException extends RouteException {
     public QueryParseException(String message) {
         super(message);
     }

@@ -67,8 +67,6 @@ public class Router<T> {
         return new Match<>(current.terminalRule.handler(), vars);
     }
 
-    record Match<T>(T handler, Map<String, CharBuffer> variables) {}
-
     record Node<T>(Token token, Node<T>[] next, RouterSetup.Rule<T> terminalRule) {
         public boolean isTerminal() {
             return terminalRule != null;  // Note: non-leaf nodes can be terminal.

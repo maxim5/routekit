@@ -470,15 +470,15 @@ public class RouterTest {
         assertOK(router.routeOrNull("/foo/bar/default/25"), "3", "name=bar", "rest=default/25");
     }
 
-    private static void assertOK(Router.Match<String> match, String tag, String ... variables) {
+    private static void assertOK(Match<String> match, String tag, String ... variables) {
         Assertions.assertEquals(match(tag, variables), match);
     }
 
-    private static void assert404(Router.Match<String> match) {
+    private static void assert404(Match<String> match) {
         Assertions.assertNull(match);
     }
 
-    private static Router.Match<String> match(String tag, String ... variables) {
+    private static Match<String> match(String tag, String ... variables) {
         Map<String, CharBuffer> map = Arrays.stream(variables)
                 .map(var -> var.split("=", -1))
                 .filter(split -> split.length == 2)
@@ -491,7 +491,7 @@ public class RouterTest {
         return match(tag, map);
     }
 
-    private static Router.Match<String> match(String tag, Map<String, CharBuffer> variables) {
-        return new Router.Match<>(tag, variables);
+    private static Match<String> match(String tag, Map<String, CharBuffer> variables) {
+        return new Match<>(tag, variables);
     }
 }

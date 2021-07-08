@@ -78,7 +78,7 @@ public class RouterBuilder {
                 .map(Sequence::rule)
                 .toList();
         if (terminal.size() > 1) {
-            throw new RuntimeException("Duplicate rules found: " + terminal.stream().map(RouterSetup.Rule::query).toList());
+            throw new RouteException("Duplicate rules found: " + terminal.stream().map(RouterSetup.Rule::query).toList());
         }
         return terminal.stream().findFirst().orElse(null);
     }
