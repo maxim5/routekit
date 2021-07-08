@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -470,7 +471,23 @@ public class RouterTest {
         assertOK(router.routeOrNull("/foo/bar/default/25"), "3", "name=bar", "rest=default/25");
     }
 
+    @Test
+    public void routeOrNull_char_buffer() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/{name}", "1")
+                .build();
+
+        assert404(router.routeOrNull(new CharBuffer("/bar/foo/name")));
+        assertOK(router.routeOrNull(new CharBuffer("/bar/foo/name").substringFrom(4)), "1", "name=name");
+        assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v")), "1", Collections.singletonMap("name", "name?k=v"));
+        assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v").substringUntil(9)), "1", "name=name");
+    }
+
     private static void assertOK(Match<String> match, String tag, String ... variables) {
+        Assertions.assertEquals(match(tag, variables), match);
+    }
+
+    private static void assertOK(Match<String> match, String tag, Map<String, String> variables) {
         Assertions.assertEquals(match(tag, variables), match);
     }
 
@@ -488,10 +505,16 @@ public class RouterTest {
                         (val1, val2) -> { throw new IllegalStateException("Duplicate values: " + val1 + " " + val2); },
                         LinkedHashMap::new)
                 );
-        return match(tag, map);
+        return makeMatch(tag, map);
     }
 
-    private static Match<String> match(String tag, Map<String, CharBuffer> variables) {
+    private static <T extends CharSequence> Match<String> match(String tag, Map<String, T> variables) {
+        Map<String, CharBuffer> buffers = variables.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new CharBuffer(e.getValue())));
+        return makeMatch(tag, buffers);
+    }
+
+    private static Match<String> makeMatch(String tag, Map<String, CharBuffer> variables) {
         return new Match<>(tag, variables);
     }
 }
