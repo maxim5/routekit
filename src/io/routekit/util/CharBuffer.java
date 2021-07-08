@@ -110,17 +110,29 @@ public class CharBuffer implements CharSequence {
         return this;
     }
 
-    public int matchUntil(char ch) {
-        return matchUntil(0, ch);
+    public int indexOf(char ch) {
+        return indexOf(ch, 0, -1);
     }
 
-    public int matchUntil(int from, char ch) {
+    public int indexOf(char ch, int from) {
+        return indexOf(ch, from, -1);
+    }
+
+    public int indexOf(char ch, int from, int def) {
         for (int i = start + from; i < end; ++i) {
             if (chars[i] == ch) {
                 return i - start;
             }
         }
-        return end - start;
+        return def;
+    }
+
+    public int matchUntil(char ch) {
+        return indexOf(ch, 0, length());
+    }
+
+    public int matchUntil(int from, char ch) {
+        return indexOf(ch, from, length());
     }
 
     public int matchCommon(CharBuffer buf) {
