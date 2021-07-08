@@ -6,8 +6,8 @@ Super-fast and lightweight Java URL router.
 ### Features
 
 - **Fast**: highly efficient routing algorithm using hashtable index, prefix trie and finite state machine. No regexp matching.
-- **GC friendly**: minimal number of allocations during routing. No `String` and `char[]` waste.
-- **Small**: whole library is one small jar.
+- **GC friendly**: minimal number of allocations during routing. No unnecessary copying and `String` and `char[]` waste.
+- **Small**: whole library is one small jar (~25kb).
 - **Scalable**: can handle thousands of rules without overhead.
 - **Simple**: supports string variables and wildcards.
 - **Lightweight**. No dependencies on other libraries. None. Zero.
