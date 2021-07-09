@@ -41,8 +41,9 @@ return match.handler().accept(match.variables());
 ### Performance
 
 Benchmark results for a small/medium size setup show that routing static URL (without variables) throughput 
-can reach 55m ops/sec, one variable URL - 10m ops/sec, two variables URL - 6m ops/sec.
-Environment: AMD Ryzen 5 4600H, 3.00 GHz, single-threaded.
+can reach <b>55m ops/sec</b>, one variable URL - <b>10m ops/sec</b>, two variables URL - <b>6m ops/sec</b>.
+<br>
+Environment: AMD Ryzen 5 4600H, 3.00 GHz, <b>single-threaded</b>.
 
 <a href='/test/io/routekit/jmh'>JMH benchmark</a> output below:
 
