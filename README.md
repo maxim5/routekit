@@ -20,7 +20,7 @@ Super-fast and lightweight Java URL router.
 ```java
 // Setup the rules. `Handler` is any class you want.
 Router<Handler> router = new RouterSetup<Handler>()
-    .add("/", new HomeHandler());
+    .add("/", new HomeHandler())
     .add("/user", new ListUsersHandler())
     .add("/user/{id}", new UserHandler())
     .add("/post", new ListBlogPostsHandler())
