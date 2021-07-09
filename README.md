@@ -44,7 +44,7 @@ Benchmark results for a small/medium size setup show that routing static URL (wi
 can reach 55m ops/sec, one variable URL - 10m ops/sec, two variables URL - 6m ops/sec.
 Environment: AMD Ryzen 5 4600H, 3.00 GHz, single-threaded.
 
-<a href='tree/master/test/io/routekit/jmh'>JMH benchmark</a> output below:
+<a href='/test/io/routekit/jmh'>JMH benchmark</a> output below:
 
 ```
 Benchmark                                 (iterations)   Mode   Samples        Score  Score error    Units
