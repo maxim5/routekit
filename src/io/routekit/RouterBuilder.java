@@ -102,7 +102,7 @@ public class RouterBuilder {
                 .reduce(null, (lhs, rhs) -> {
                     if (lhs == null) return rhs;
                     if (rhs == null) return lhs;
-                    return lhs.substringUntil(lhs.matchCommon(rhs));
+                    return lhs.substringUntil(lhs.commonPrefix(rhs));
                 });
 
         if (commonPrefix != null && commonPrefix.isNotEmpty() && commonPrefix.length() >= minCommonPrefixLength) {

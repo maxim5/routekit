@@ -61,34 +61,65 @@ public class CharBufferTest {
     }
 
     @Test
-    public void matchCommon() {
-        Assertions.assertEquals(0, new CharBuffer("foo").matchCommon(new CharBuffer("bar")));
-        Assertions.assertEquals(2, new CharBuffer("bar").matchCommon(new CharBuffer("baz")));
+    public void commonPrefix() {
+        Assertions.assertEquals(0, new CharBuffer("foo").commonPrefix(new CharBuffer("bar")));
+        Assertions.assertEquals(2, new CharBuffer("bar").commonPrefix(new CharBuffer("baz")));
 
-        Assertions.assertEquals(0, new CharBuffer("foo").matchCommon(new CharBuffer("foobar", 3, 6)));
-        Assertions.assertEquals(2, new CharBuffer("bar").matchCommon(new CharBuffer("barbaz", 3, 6)));
-        Assertions.assertEquals(0, new CharBuffer("foobar", 3, 6).matchCommon(new CharBuffer("foo")));
-        Assertions.assertEquals(2, new CharBuffer("barbaz", 3, 6).matchCommon(new CharBuffer("bar")));
+        Assertions.assertEquals(0, new CharBuffer("foo").commonPrefix(new CharBuffer("foobar", 3, 6)));
+        Assertions.assertEquals(2, new CharBuffer("bar").commonPrefix(new CharBuffer("barbaz", 3, 6)));
+        Assertions.assertEquals(0, new CharBuffer("foobar", 3, 6).commonPrefix(new CharBuffer("foo")));
+        Assertions.assertEquals(2, new CharBuffer("barbaz", 3, 6).commonPrefix(new CharBuffer("bar")));
     }
 
     @Test
-    public void matchCommon_empty() {
-        Assertions.assertEquals(0, new CharBuffer("").matchCommon(new CharBuffer("")));
-        Assertions.assertEquals(0, new CharBuffer("foo").matchCommon(new CharBuffer("")));
-        Assertions.assertEquals(0, new CharBuffer("").matchCommon(new CharBuffer("foo")));
+    public void commonPrefix_empty() {
+        Assertions.assertEquals(0, new CharBuffer("").commonPrefix(new CharBuffer("")));
+        Assertions.assertEquals(0, new CharBuffer("foo").commonPrefix(new CharBuffer("")));
+        Assertions.assertEquals(0, new CharBuffer("").commonPrefix(new CharBuffer("foo")));
 
-        Assertions.assertEquals(0, new CharBuffer("foo", 1, 2).matchCommon(new CharBuffer("foo", 3, 3)));
-        Assertions.assertEquals(0, new CharBuffer("xxx", 1, 1).matchCommon(new CharBuffer("xxx", 2, 2)));
+        Assertions.assertEquals(0, new CharBuffer("foo", 1, 2).commonPrefix(new CharBuffer("foo", 3, 3)));
+        Assertions.assertEquals(0, new CharBuffer("xxx", 1, 1).commonPrefix(new CharBuffer("xxx", 2, 2)));
     }
 
     @Test
-    public void matchCommon_common_prefix() {
-        Assertions.assertEquals(3, new CharBuffer("foo").matchCommon(new CharBuffer("foo")));
-        Assertions.assertEquals(3, new CharBuffer("foo").matchCommon(new CharBuffer("foobar")));
-        Assertions.assertEquals(3, new CharBuffer("foobar").matchCommon(new CharBuffer("foo")));
+    public void commonPrefix_same_prefix() {
+        Assertions.assertEquals(3, new CharBuffer("foo").commonPrefix(new CharBuffer("foo")));
+        Assertions.assertEquals(3, new CharBuffer("foo").commonPrefix(new CharBuffer("foobar")));
+        Assertions.assertEquals(3, new CharBuffer("foobar").commonPrefix(new CharBuffer("foo")));
 
-        Assertions.assertEquals(3, new CharBuffer("foo").matchCommon(new CharBuffer("barfoo", 3, 6)));
-        Assertions.assertEquals(3, new CharBuffer("barfoo", 3, 6).matchCommon(new CharBuffer("foo")));
+        Assertions.assertEquals(3, new CharBuffer("foo").commonPrefix(new CharBuffer("barfoo", 3, 6)));
+        Assertions.assertEquals(3, new CharBuffer("barfoo", 3, 6).commonPrefix(new CharBuffer("foo")));
+    }
+
+    @Test
+    public void commonSuffix() {
+        Assertions.assertEquals(0, new CharBuffer("foo").commonSuffix(new CharBuffer("bar")));
+        Assertions.assertEquals(2, new CharBuffer("foo").commonSuffix(new CharBuffer("boo")));
+
+        Assertions.assertEquals(0, new CharBuffer("foo").commonSuffix(new CharBuffer("foobar", 3, 6)));
+        Assertions.assertEquals(2, new CharBuffer("foo").commonSuffix(new CharBuffer("fooboo", 3, 6)));
+        Assertions.assertEquals(0, new CharBuffer("foobar", 3, 6).commonSuffix(new CharBuffer("foo")));
+        Assertions.assertEquals(2, new CharBuffer("fooboo", 3, 6).commonSuffix(new CharBuffer("foo")));
+    }
+
+    @Test
+    public void commonSuffix_empty() {
+        Assertions.assertEquals(0, new CharBuffer("").commonSuffix(new CharBuffer("")));
+        Assertions.assertEquals(0, new CharBuffer("foo").commonSuffix(new CharBuffer("")));
+        Assertions.assertEquals(0, new CharBuffer("").commonSuffix(new CharBuffer("foo")));
+
+        Assertions.assertEquals(0, new CharBuffer("foo", 1, 2).commonSuffix(new CharBuffer("foo", 3, 3)));
+        Assertions.assertEquals(0, new CharBuffer("xxx", 1, 1).commonSuffix(new CharBuffer("xxx", 2, 2)));
+    }
+
+    @Test
+    public void commonSuffix_same_suffix() {
+        Assertions.assertEquals(3, new CharBuffer("foo").commonSuffix(new CharBuffer("foo")));
+        Assertions.assertEquals(3, new CharBuffer("foo").commonSuffix(new CharBuffer("barfoo")));
+        Assertions.assertEquals(3, new CharBuffer("barfoo").commonSuffix(new CharBuffer("foo")));
+
+        Assertions.assertEquals(3, new CharBuffer("foo").commonSuffix(new CharBuffer("barfoo", 3, 6)));
+        Assertions.assertEquals(3, new CharBuffer("barfoo", 3, 6).commonSuffix(new CharBuffer("foo")));
     }
 
     @Test

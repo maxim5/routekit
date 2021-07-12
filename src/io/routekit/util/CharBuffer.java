@@ -135,9 +135,20 @@ public class CharBuffer implements CharSequence {
         return indexOf(ch, from, length());
     }
 
-    public int matchCommon(CharBuffer buf) {
+    // Returns the length of the common prefix
+    public int commonPrefix(CharBuffer buf) {
         int index = Arrays.mismatch(chars, start, end, buf.chars, buf.start, buf.end);
         return (index >= 0) ? index : length();
+    }
+
+    // Returns the length of the common suffix
+    public int commonSuffix(CharBuffer buf) {
+        int i = 1;
+        int limit = Math.min(length(), buf.length());
+        while (i <= limit && chars[end - i] == buf.chars[buf.end - i]) {
+            i++;
+        }
+        return i - 1;
     }
 
     public static CharBuffer join(CharBuffer lhs, CharBuffer rhs) {
