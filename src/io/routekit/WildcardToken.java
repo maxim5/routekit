@@ -14,6 +14,6 @@ public class WildcardToken extends Variable implements Token {
 
     @Override
     public String toString() {
-        return "WildcardToken[" + name() + "]";
+        return "WildcardToken[%s]".formatted(name());
     }
 }

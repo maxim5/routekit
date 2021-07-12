@@ -21,6 +21,6 @@ public class SeparableVariableToken extends Variable implements Token {
 
     @Override
     public String toString() {
-        return "SeparableVariableToken[" + name() + "]";
+        return "SeparableVariableToken[%s]".formatted(name());
     }
 }

@@ -28,7 +28,7 @@ public class ConstToken implements Token {
 
     @Override
     public String toString() {
-        return "ConstToken[" + token + "]";
+        return "ConstToken[%s]".formatted(token);
     }
 
     @Override
