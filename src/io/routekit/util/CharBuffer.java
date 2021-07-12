@@ -102,6 +102,38 @@ public class CharBuffer implements CharSequence {
                 Arrays.equals(chars, end - suffix.length(), end, suffix.chars, suffix.start, suffix.end);
     }
 
+    public boolean startsWith(char ch) {
+        return isNotEmpty() && chars[start] == ch;
+    }
+
+    public boolean endsWith(char ch) {
+        return isNotEmpty() && chars[end - 1] == ch;
+    }
+
+    public boolean startsWith(CharSequence prefix) {
+        int length = prefix.length();
+        if (length() < length) {
+            return false;
+        }
+        int i = 0;
+        while (i < length && chars[i + start] == prefix.charAt(i)) {
+            i++;
+        }
+        return i == length;
+    }
+
+    public boolean endsWith(CharSequence prefix) {
+        int length = prefix.length();
+        if (length() < length) {
+            return false;
+        }
+        int i = 1;
+        while (i <= length && chars[end - i] == prefix.charAt(length - i)) {
+            i++;
+        }
+        return i > length;
+    }
+
     public MutableCharBuffer mutable() {
         return new MutableCharBuffer(chars, start, end);
     }

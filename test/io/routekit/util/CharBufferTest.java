@@ -132,8 +132,35 @@ public class CharBufferTest {
 
         Assertions.assertFalse(buffer.startsWith(new CharBuffer("x")));
         Assertions.assertFalse(buffer.startsWith(new CharBuffer("bar")));
+        Assertions.assertFalse(buffer.startsWith(new CharBuffer("foe")));
         Assertions.assertFalse(buffer.startsWith(new CharBuffer("foo!")));
         Assertions.assertFalse(buffer.startsWith(new CharBuffer("foobar")));
+    }
+
+    @Test
+    public void startsWith_string() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.startsWith(""));
+        Assertions.assertTrue(buffer.startsWith("f"));
+        Assertions.assertTrue(buffer.startsWith("fo"));
+        Assertions.assertTrue(buffer.startsWith("foo"));
+
+        Assertions.assertFalse(buffer.startsWith("x"));
+        Assertions.assertFalse(buffer.startsWith("bar"));
+        Assertions.assertFalse(buffer.startsWith("foe"));
+        Assertions.assertFalse(buffer.startsWith("foo!"));
+        Assertions.assertFalse(buffer.startsWith("foobar"));
+    }
+
+    @Test
+    public void startsWith_char() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.startsWith('f'));
+        Assertions.assertFalse(buffer.startsWith('o'));
+        Assertions.assertFalse(buffer.startsWith('a'));
+        Assertions.assertFalse(buffer.startsWith('x'));
+
+        Assertions.assertFalse(new CharBuffer("").startsWith(' '));
     }
 
     @Test
@@ -146,8 +173,35 @@ public class CharBufferTest {
 
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("x")));
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("bar")));
+        Assertions.assertFalse(buffer.endsWith(new CharBuffer("boo")));
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("!foo")));
         Assertions.assertFalse(buffer.endsWith(new CharBuffer("barfoo")));
+    }
+
+    @Test
+    public void endsWith_string() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.endsWith(""));
+        Assertions.assertTrue(buffer.endsWith("o"));
+        Assertions.assertTrue(buffer.endsWith("oo"));
+        Assertions.assertTrue(buffer.endsWith("foo"));
+
+        Assertions.assertFalse(buffer.endsWith("x"));
+        Assertions.assertFalse(buffer.endsWith("bar"));
+        Assertions.assertFalse(buffer.endsWith("boo"));
+        Assertions.assertFalse(buffer.endsWith("!foo"));
+        Assertions.assertFalse(buffer.endsWith("barfoo"));
+    }
+
+    @Test
+    public void endsWith_char() {
+        CharBuffer buffer = new CharBuffer("foo");
+        Assertions.assertTrue(buffer.endsWith('o'));
+        Assertions.assertFalse(buffer.endsWith('f'));
+        Assertions.assertFalse(buffer.endsWith('a'));
+        Assertions.assertFalse(buffer.endsWith('x'));
+
+        Assertions.assertFalse(new CharBuffer("").endsWith(' '));
     }
 
     @Test
