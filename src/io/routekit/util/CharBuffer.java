@@ -199,6 +199,16 @@ public class CharBuffer implements CharSequence {
         return new CharBuffer(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
     }
 
+    public CharBuffer cutPrefix(CharBuffer prefix) {
+        int index = commonPrefix(prefix);
+        return index < prefix.length() ? this : substringFrom(index);
+    }
+
+    public CharBuffer cutSuffix(CharBuffer suffix) {
+        int index = commonSuffix(suffix);
+        return index < suffix.length() ? this : substringUntil(length() - index);
+    }
+
     @Override
     public String toString() {
         return new String(chars, start, end - start);

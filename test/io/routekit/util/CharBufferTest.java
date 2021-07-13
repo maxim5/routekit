@@ -256,6 +256,46 @@ public class CharBufferTest {
         Assertions.assertEquals(buffer, join);
     }
 
+    @Test
+    public void cutPrefix() {
+        CharBuffer foobar = new CharBuffer("foobar");
+        CharBuffer foo = new CharBuffer("foo");
+        CharBuffer bar = new CharBuffer("bar");
+        CharBuffer empty = new CharBuffer("");
+
+        Assertions.assertEquals(foobar.cutPrefix(empty), foobar);
+        Assertions.assertEquals(foobar.cutPrefix(foo), bar);
+        Assertions.assertEquals(foobar.cutPrefix(foo), bar);
+        Assertions.assertEquals(foobar.cutPrefix(foobar), empty);
+
+        Assertions.assertEquals(foobar.substringFrom(3), bar);
+        Assertions.assertEquals(foobar.substringFrom(3).cutPrefix(foo), bar);
+        Assertions.assertEquals(foobar.substringFrom(3).cutPrefix(bar), empty);
+        Assertions.assertEquals(foobar.substringFrom(3).cutPrefix(bar.substringUntil(0)), bar);
+        Assertions.assertEquals(foobar.substringFrom(3).cutPrefix(bar.substringUntil(1)), new CharBuffer("ar"));  // cut b
+        Assertions.assertEquals(foobar.substringFrom(3).cutPrefix(bar.substringUntil(2)), new CharBuffer("r"));   // cut ba
+    }
+
+    @Test
+    public void cutSuffix() {
+        CharBuffer foobar = new CharBuffer("foobar");
+        CharBuffer foo = new CharBuffer("foo");
+        CharBuffer bar = new CharBuffer("bar");
+        CharBuffer empty = new CharBuffer("");
+
+        Assertions.assertEquals(foobar.cutSuffix(empty), foobar);
+        Assertions.assertEquals(foobar.cutSuffix(bar), foo);
+        Assertions.assertEquals(foobar.cutSuffix(foo), foobar);
+        Assertions.assertEquals(foobar.cutSuffix(foobar), empty);
+
+        Assertions.assertEquals(foobar.substringFrom(3), bar);
+        Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(foo), bar);
+        Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar), empty);
+        Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(1)), new CharBuffer("b"));   // cut ar
+        Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(2)), new CharBuffer("ba"));  // cut r
+        Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(3)), bar);
+    }
+
     private static void assertEqualsHashCode(CharBuffer lhs, CharBuffer rhs) {
         Assertions.assertEquals(lhs, rhs);
         Assertions.assertEquals(lhs.hashCode(), rhs.hashCode());
