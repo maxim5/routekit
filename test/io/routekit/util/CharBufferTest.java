@@ -41,6 +41,28 @@ public class CharBufferTest {
     }
 
     @Test
+    public void indexOf() {
+        CharBuffer buffer = new CharBuffer("foo-bar-baz");
+        Assertions.assertEquals(0, buffer.indexOf('f'));
+        Assertions.assertEquals(1, buffer.indexOf('o'));
+        Assertions.assertEquals(3, buffer.indexOf('-'));
+        Assertions.assertEquals(5, buffer.indexOf('a'));
+        Assertions.assertEquals(10, buffer.indexOf('z'));
+        Assertions.assertEquals(-1, buffer.indexOf('w'));
+    }
+
+    @Test
+    public void lastIndexOf() {
+        CharBuffer buffer = new CharBuffer("foo-bar-baz");
+        Assertions.assertEquals(0, buffer.lastIndexOf('f'));
+        Assertions.assertEquals(2, buffer.lastIndexOf('o'));
+        Assertions.assertEquals(7, buffer.lastIndexOf('-'));
+        Assertions.assertEquals(9, buffer.lastIndexOf('a'));
+        Assertions.assertEquals(10, buffer.lastIndexOf('z'));
+        Assertions.assertEquals(-1, buffer.lastIndexOf('w'));
+    }
+
+    @Test
     public void matchUntil() {
         CharBuffer buffer = new CharBuffer("foo-bar-baz");
         Assertions.assertEquals(0, buffer.matchUntil('f'));

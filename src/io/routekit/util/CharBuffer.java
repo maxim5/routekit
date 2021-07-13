@@ -167,6 +167,23 @@ public class CharBuffer implements CharSequence {
         return indexOf(ch, from, length());
     }
 
+    public int lastIndexOf(char ch) {
+        return lastIndexOf(ch, end - 1, -1);
+    }
+
+    public int lastIndexOf(char ch, int from) {
+        return lastIndexOf(ch, from, -1);
+    }
+
+    public int lastIndexOf(char ch, int from, int def) {
+        for (int i = from; i >= start; --i) {
+            if (chars[i] == ch) {
+                return i - start;
+            }
+        }
+        return def;
+    }
+
     // Returns the length of the common prefix
     public int commonPrefix(CharBuffer buf) {
         int index = Arrays.mismatch(chars, start, end, buf.chars, buf.start, buf.end);
