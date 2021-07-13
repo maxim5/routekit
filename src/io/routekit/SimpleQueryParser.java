@@ -22,13 +22,13 @@ public record SimpleQueryParser(char separator) implements QueryParser {
         ArrayList<Token> tokens = new ArrayList<>();
         while (true) {
             int length = buffer.length();
-            int open = buffer.matchUntil(VAR_OPEN);
+            int open = buffer.indexOf(VAR_OPEN, 0, length);  // match until variable start
             if (open > 0) {
                 tokens.add(new ConstToken(buffer.substringUntil(open)));
             }
             if (open < length) {
-                int close = buffer.matchUntil(open, VAR_CLOSE);
-                QueryParseException.failIf(close >= length, "Failed to parse variables in the query: " + input);
+                int close = buffer.indexOf(VAR_CLOSE, open);
+                QueryParseException.failIf(close < 0, "Failed to parse variables in the query: " + input);
 
                 boolean isWildcard = buffer.at(open + 1) == '*';
                 String varName = buffer.substring(open + (isWildcard ? 2 : 1), close).toString();

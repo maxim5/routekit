@@ -126,8 +126,8 @@ public class RouterBuilder {
                 .filter(seq -> seq.tokens.peek() instanceof ConstToken)
                 .forEach(sequence -> {
                     CharBuffer buffer = ((ConstToken) sequence.tokens.peek()).buffer();
-                    int index = buffer.matchUntil(1, separator);
-                    if (index < buffer.length()) {
+                    int index = buffer.indexOf(separator, 1);
+                    if (index >= 0) {
                         sequence.tokens.poll();
                         sequence.tokens.addFirst(new ConstToken(buffer.substringFrom(index)));
                         sequence.tokens.addFirst(new ConstToken(buffer.substringUntil(index)));

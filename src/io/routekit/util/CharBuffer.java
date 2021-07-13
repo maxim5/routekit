@@ -159,14 +159,6 @@ public class CharBuffer implements CharSequence {
         return def;
     }
 
-    public int matchUntil(char ch) {
-        return indexOf(ch, 0, length());
-    }
-
-    public int matchUntil(int from, char ch) {
-        return indexOf(ch, from, length());
-    }
-
     public int lastIndexOf(char ch) {
         return lastIndexOf(ch, end - 1, -1);
     }

@@ -43,43 +43,47 @@ public class CharBufferTest {
     @Test
     public void indexOf() {
         CharBuffer buffer = new CharBuffer("foo-bar-baz");
+
         Assertions.assertEquals(0, buffer.indexOf('f'));
         Assertions.assertEquals(1, buffer.indexOf('o'));
         Assertions.assertEquals(3, buffer.indexOf('-'));
         Assertions.assertEquals(5, buffer.indexOf('a'));
         Assertions.assertEquals(10, buffer.indexOf('z'));
         Assertions.assertEquals(-1, buffer.indexOf('w'));
+
+        Assertions.assertEquals(-1, buffer.indexOf('f', 1));
+        Assertions.assertEquals(-2, buffer.indexOf('f', 1, -2));
+        Assertions.assertEquals(11, buffer.indexOf('f', 1, buffer.length()));
+        Assertions.assertEquals(1, buffer.indexOf('o', 1));
+        Assertions.assertEquals(1, buffer.indexOf('o', 1, -2));
+        Assertions.assertEquals(3, buffer.indexOf('-', 3));
+        Assertions.assertEquals(3, buffer.indexOf('-', 3, buffer.length()));
+        Assertions.assertEquals(7, buffer.indexOf('-', 4));
+        Assertions.assertEquals(7, buffer.indexOf('-', 4, buffer.length()));
+        Assertions.assertEquals(7, buffer.indexOf('-', 4, -2));
+        Assertions.assertEquals(7, buffer.indexOf('-', 7, buffer.length()));
+        Assertions.assertEquals(11, buffer.indexOf('-', 8, buffer.length()));
     }
 
     @Test
     public void lastIndexOf() {
         CharBuffer buffer = new CharBuffer("foo-bar-baz");
+
         Assertions.assertEquals(0, buffer.lastIndexOf('f'));
         Assertions.assertEquals(2, buffer.lastIndexOf('o'));
         Assertions.assertEquals(7, buffer.lastIndexOf('-'));
         Assertions.assertEquals(9, buffer.lastIndexOf('a'));
         Assertions.assertEquals(10, buffer.lastIndexOf('z'));
         Assertions.assertEquals(-1, buffer.lastIndexOf('w'));
-    }
 
-    @Test
-    public void matchUntil() {
-        CharBuffer buffer = new CharBuffer("foo-bar-baz");
-        Assertions.assertEquals(0, buffer.matchUntil('f'));
-        Assertions.assertEquals(1, buffer.matchUntil('o'));
-        Assertions.assertEquals(3, buffer.matchUntil('-'));
-        Assertions.assertEquals(10, buffer.matchUntil('z'));
-        Assertions.assertEquals(11, buffer.matchUntil('w'));
-    }
-
-    @Test
-    public void matchUntilFrom() {
-        CharBuffer buffer = new CharBuffer("foo-bar-baz");
-        Assertions.assertEquals(11, buffer.matchUntil(1, 'f'));
-        Assertions.assertEquals(3, buffer.matchUntil(3, '-'));
-        Assertions.assertEquals(7, buffer.matchUntil(4, '-'));
-        Assertions.assertEquals(7, buffer.matchUntil(7, '-'));
-        Assertions.assertEquals(11, buffer.matchUntil(8, '-'));
+        Assertions.assertEquals(0, buffer.lastIndexOf('f', 10));
+        Assertions.assertEquals(0, buffer.lastIndexOf('f', 10, -1));
+        Assertions.assertEquals(9, buffer.lastIndexOf('a', 10));
+        Assertions.assertEquals(9, buffer.lastIndexOf('a', 9));
+        Assertions.assertEquals(5, buffer.lastIndexOf('a', 8));
+        Assertions.assertEquals(5, buffer.lastIndexOf('a', 5));
+        Assertions.assertEquals(-1, buffer.lastIndexOf('a', 4));
+        Assertions.assertEquals(-2, buffer.lastIndexOf('a', 4, -2));
     }
 
     @Test
