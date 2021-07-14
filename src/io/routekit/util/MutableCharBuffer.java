@@ -68,7 +68,7 @@ public class MutableCharBuffer extends CharBuffer {
         assert start <= end;
     }
 
-    public static MutableCharBuffer join(MutableCharBuffer lhs, MutableCharBuffer rhs) {
+    public static MutableCharBuffer join(CharBuffer lhs, CharBuffer rhs) {
         if (lhs.chars == rhs.chars && lhs.end == rhs.start) {
             return new MutableCharBuffer(lhs.chars, lhs.start, rhs.end);
         }

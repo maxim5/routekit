@@ -3,9 +3,13 @@ package io.routekit;
 import io.routekit.util.CharBuffer;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class RouterBuilder {
+    private static final Logger log = Logger.getLogger("RouteKit");
+
     public static final char DEFAULT_SEPARATOR = '/';
     public static final int DEFAULT_MIN_COMMON_PREFIX = 1;
 
@@ -37,6 +41,7 @@ public class RouterBuilder {
     public <T> Router<T> buildRouter(List<RouterSetup.Rule<T>> rules) {
         Map<CharBuffer, T> quickMatchIndex = buildQuickMatchIndex(rules);
         Router.Node<T> root = buildStateMachine(rules);
+        log.log(Level.FINEST, () -> "Using quick-match index of size %d".formatted(quickMatchIndex.size()));
         return new Router<>(quickMatchIndex, root);
     }
 

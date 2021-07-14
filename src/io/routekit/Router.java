@@ -6,8 +6,12 @@ import io.routekit.util.MutableCharBuffer;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Router<T> {
+    private static final Logger log = Logger.getLogger("RouteKit");
+
     private final Map<CharBuffer, T> quickMatchIndex;
     private final Node<T> root;
 
@@ -31,6 +35,7 @@ public class Router<T> {
     public Match<T> routeOrNull(CharBuffer input) {
         T match = quickMatchIndex.get(input);
         if (match != null) {
+            log.log(Level.FINEST, () -> "Routing `%s`: return immediately from the quick-match index".formatted(input));
             return new Match<>(match, Collections.emptyMap());
         }
 
@@ -52,6 +57,7 @@ public class Router<T> {
                 }
             }
             if (maxNode == null) {
+                log.log(Level.FINEST, () -> "Routing `%s`: no continuation found at `%s`".formatted(input, buffer));
                 return null;  // no continuation found
             }
             if (maxNode.token instanceof Variable variable) {
@@ -62,8 +68,10 @@ public class Router<T> {
         }
 
         if (!current.isTerminal()) {
+            log.log(Level.FINEST, () -> "Routing `%s`: matches non-terminal node (middle of the rule)".formatted(input));
             return null;  // matches part of the rule
         }
+        log.log(Level.FINEST, () -> "Routing `%s`: matches with variables %s".formatted(input, vars));
         return new Match<>(current.terminalRule.handler(), vars);
     }
 
