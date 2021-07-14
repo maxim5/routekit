@@ -2,9 +2,12 @@ package io.routekit.util;
 
 import java.util.Arrays;
 import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 /**
- *
+ * A String-like wrapper around `char[]` array, providing efficient slice, join and for-each operations.
+ * <p>
+ * `CharBuffer` owns the encapsulated char array, but, by default, is immutable (see also {@link MutableCharBuffer}).
  */
 public class CharBuffer implements CharSequence {
     protected final char[] chars;
@@ -12,9 +15,10 @@ public class CharBuffer implements CharSequence {
     protected int end;
 
     public CharBuffer(char[] chars, int start, int end) {
-        assert 0 <= start;
-        assert start <= end;
-        assert end <= chars.length;
+        assert chars != null : "CharBuffer chars array is null";
+        assert 0 <= start : "CharBuffer start=%d can't be negative".formatted(start);
+        assert start <= end : "CharBuffer start=%d is greater than end=%d".formatted(start, end);
+        assert end <= chars.length : "CharBuffer end=%d is greater than array.length=%d".formatted(end, chars.length);
         this.chars = chars;
         this.start = start;
         this.end = end;
@@ -34,6 +38,12 @@ public class CharBuffer implements CharSequence {
 
     public CharBuffer(CharSequence s) {
         this(s.toString().toCharArray(), 0, s.length());
+    }
+
+    public CharBuffer(java.nio.CharBuffer buffer) {
+        this(buffer.isReadOnly() ? buffer.toString().toCharArray() : buffer.array(),
+             buffer.isReadOnly() ? 0 : buffer.position(),
+             buffer.isReadOnly() ? buffer.length() : buffer.position() + buffer.length());
     }
 
     public CharBuffer(CharBuffer s) {
@@ -73,6 +83,16 @@ public class CharBuffer implements CharSequence {
         for (int i = start; i < end; ++i) {
             consumer.accept(chars[i]);
         }
+    }
+
+    @Override
+    public IntStream chars() {
+        return asRawBuffer().chars();
+    }
+
+    @Override
+    public IntStream codePoints() {
+        return asRawBuffer().codePoints();
     }
 
     public CharBuffer substringFrom(int start) {
@@ -134,6 +154,14 @@ public class CharBuffer implements CharSequence {
         return i > length;
     }
 
+    public java.nio.CharBuffer asNioBuffer() {
+        return asRawBuffer().asReadOnlyBuffer();
+    }
+
+    protected java.nio.CharBuffer asRawBuffer() {
+        return java.nio.CharBuffer.wrap(chars, start, end - start);
+    }
+
     public MutableCharBuffer mutable() {
         return new MutableCharBuffer(chars, start, end);
     }
@@ -151,6 +179,8 @@ public class CharBuffer implements CharSequence {
     }
 
     public int indexOf(char ch, int from, int def) {
+        assert from >= 0 : "From index can't be negative: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
         for (int i = start + from; i < end; ++i) {
             if (chars[i] == ch) {
                 return i - start;
@@ -168,6 +198,8 @@ public class CharBuffer implements CharSequence {
     }
 
     public int lastIndexOf(char ch, int from, int def) {
+        assert from >= 0 : "From index can't be negative: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
         for (int i = from; i >= start; --i) {
             if (chars[i] == ch) {
                 return i - start;

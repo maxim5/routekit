@@ -25,6 +25,14 @@ public class MutableCharBuffer extends CharBuffer {
         super(s);
     }
 
+    public MutableCharBuffer(java.nio.CharBuffer buffer) {
+        super(buffer);
+    }
+
+    public java.nio.CharBuffer asNioBuffer() {
+        return asRawBuffer();
+    }
+
     public MutableCharBuffer mutable() {
         return this;
     }
@@ -58,5 +66,12 @@ public class MutableCharBuffer extends CharBuffer {
     public void offsetEnd(int offset) {
         end -= offset;
         assert start <= end;
+    }
+
+    public static MutableCharBuffer join(MutableCharBuffer lhs, MutableCharBuffer rhs) {
+        if (lhs.chars == rhs.chars && lhs.end == rhs.start) {
+            return new MutableCharBuffer(lhs.chars, lhs.start, rhs.end);
+        }
+        return new MutableCharBuffer(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
     }
 }

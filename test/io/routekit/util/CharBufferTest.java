@@ -21,6 +21,30 @@ public class CharBufferTest {
     }
 
     @Test
+    public void create_from_nio_buffer_readonly() {
+        java.nio.CharBuffer nioBuffer = java.nio.CharBuffer.wrap("foobar", 2, 5);
+        Assertions.assertTrue(nioBuffer.isReadOnly());
+
+        CharBuffer buffer = new CharBuffer(nioBuffer);
+        Assertions.assertEquals(new CharBuffer("oba"), buffer);
+        Assertions.assertArrayEquals("oba".toCharArray(), buffer.chars);
+        Assertions.assertEquals(0, buffer.start);
+        Assertions.assertEquals(3, buffer.end);
+    }
+
+    @Test
+    public void create_from_nio_buffer_writable() {
+        java.nio.CharBuffer nioBuffer = java.nio.CharBuffer.wrap("foobar".toCharArray(), 2, 3);
+        Assertions.assertFalse(nioBuffer.isReadOnly());
+
+        CharBuffer buffer = new CharBuffer(nioBuffer);
+        Assertions.assertEquals(new CharBuffer("oba"), buffer);
+        Assertions.assertArrayEquals("foobar".toCharArray(), buffer.chars);
+        Assertions.assertEquals(2, buffer.start);
+        Assertions.assertEquals(5, buffer.end);
+    }
+
+    @Test
     public void equals_and_hashCode() {
         assertEqualsHashCode(new CharBuffer(""), new CharBuffer(""));
         assertEqualsHashCode(new CharBuffer(""), new CharBuffer("foo", 0, 0));
@@ -294,6 +318,42 @@ public class CharBufferTest {
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(1)), new CharBuffer("b"));   // cut ar
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(2)), new CharBuffer("ba"));  // cut r
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(3)), bar);
+    }
+
+    @Test
+    public void chars() {
+        int[] array = new CharBuffer("foobar").chars().toArray();
+        Assertions.assertArrayEquals(new int[]{ 102, 111, 111,  98, 97, 114 }, array);
+    }
+
+    @Test
+    public void chars_empty() {
+        int[] array = new CharBuffer("").chars().toArray();
+        Assertions.assertArrayEquals(new int[0], array);
+    }
+
+    @Test
+    public void chars_of_subbuffer() {
+        int[] array = new CharBuffer("foobar", 1, 3).chars().toArray();
+        Assertions.assertArrayEquals(new int[]{ 111, 111 }, array);
+    }
+
+    @Test
+    public void codepoints() {
+        int[] array = new CharBuffer("foobar").codePoints().toArray();
+        Assertions.assertArrayEquals(new int[]{ 102, 111, 111,  98, 97, 114 }, array);
+    }
+
+    @Test
+    public void codepoints_empty() {
+        int[] array = new CharBuffer("").codePoints().toArray();
+        Assertions.assertArrayEquals(new int[0], array);
+    }
+
+    @Test
+    public void codepoints_of_subbuffer() {
+        int[] array = new CharBuffer("foobar", 1, 3).codePoints().toArray();
+        Assertions.assertArrayEquals(new int[]{ 111, 111 }, array);
     }
 
     private static void assertEqualsHashCode(CharBuffer lhs, CharBuffer rhs) {
