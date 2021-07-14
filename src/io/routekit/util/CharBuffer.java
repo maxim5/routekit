@@ -72,11 +72,12 @@ public class CharBuffer implements CharSequence {
 
     @Override
     public char charAt(int index) {
+        assert index >= 0 : "Index can't be negative: %d".formatted(index);
         return chars[start + index];
     }
 
     public int at(int index) {
-        return index < length() ? chars[start + index] : -1;
+        return index >= 0 && index < length() ? chars[start + index] : -1;
     }
 
     public void forEach(IntConsumer consumer) {
@@ -104,6 +105,8 @@ public class CharBuffer implements CharSequence {
     }
 
     public CharBuffer substring(int start, int end) {
+        assert start >= 0 : "Start index can't be negative: %d".formatted(start);
+        assert start <= end : "Start index can't be larger than end index: %d >= %d".formatted(start, end);
         return new CharBuffer(chars, this.start + start, this.start + end);
     }
 
@@ -159,7 +162,7 @@ public class CharBuffer implements CharSequence {
     }
 
     protected java.nio.CharBuffer asRawBuffer() {
-        return java.nio.CharBuffer.wrap(chars, start, end - start);
+        return java.nio.CharBuffer.wrap(chars, start, end - start);  // note: writable!
     }
 
     public MutableCharBuffer mutable() {

@@ -58,6 +58,8 @@ public class CharBufferTest {
 
     @Test
     public void create_invalid_pointers() {
+        //noinspection ConstantConditions
+        Assertions.assertThrows(AssertionError.class, () -> new CharBuffer((char[]) null, 0, 0));
         Assertions.assertThrows(AssertionError.class, () -> new CharBuffer("foo", -1, 2));
         Assertions.assertThrows(AssertionError.class, () -> new CharBuffer("foo", 2, 1));
         Assertions.assertThrows(AssertionError.class, () -> new CharBuffer("foo", 0, 4));
