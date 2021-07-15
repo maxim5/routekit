@@ -235,13 +235,13 @@ public class CharBuffer implements CharSequence {
     }
 
     public CharBuffer cutPrefix(CharBuffer prefix) {
-        int index = commonPrefix(prefix);
-        return index < prefix.length() ? this : substringFrom(index);
+        int len = commonPrefix(prefix);
+        return len < prefix.length() ? this : substringFrom(len);
     }
 
     public CharBuffer cutSuffix(CharBuffer suffix) {
-        int index = commonSuffix(suffix);
-        return index < suffix.length() ? this : substringUntil(length() - index);
+        int len = commonSuffix(suffix);
+        return len < suffix.length() ? this : substringUntil(length() - len);
     }
 
     @Override

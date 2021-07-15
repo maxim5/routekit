@@ -59,13 +59,27 @@ public class MutableCharBuffer extends CharBuffer {
     }
 
     public void offsetStart(int offset) {
+        assert start+offset <= end : "Invalid offset: makes start=%d greater than end=%d".formatted(start+offset, end);
         start += offset;
-        assert start <= end;
     }
 
     public void offsetEnd(int offset) {
+        assert start <= end-offset : "Invalid offset: makes start=%d greater than end=%d".formatted(start, end-offset);
         end -= offset;
-        assert start <= end;
+    }
+
+    public void offsetPrefix(CharBuffer prefix) {
+        int len = commonPrefix(prefix);
+        if (len == prefix.length()) {
+            offsetStart(len);
+        }
+    }
+
+    public void offsetSuffix(CharBuffer suffix) {
+        int len = commonSuffix(suffix);
+        if (len == suffix.length()) {
+            offsetEnd(len);
+        }
     }
 
     public static MutableCharBuffer join(CharBuffer lhs, CharBuffer rhs) {
