@@ -1,6 +1,7 @@
 package io.routekit;
 
 import io.routekit.util.CharBuffer;
+import io.routekit.util.MutableCharBuffer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -472,7 +473,7 @@ public class RouterTest {
     }
 
     @Test
-    public void routeOrNull_char_buffer() {
+    public void routeOrNull_char_buffer_as_input() {
         Router<String> router = new RouterSetup<String>()
                 .add("/foo/{name}", "1")
                 .build();
@@ -481,6 +482,22 @@ public class RouterTest {
         assertOK(router.routeOrNull(new CharBuffer("/bar/foo/name").substringFrom(4)), "1", "name=name");
         assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v")), "1", Collections.singletonMap("name", "name?k=v"));
         assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v").substringUntil(9)), "1", "name=name");
+    }
+
+    @Test
+    public void routeOrNull_quick_match_char_buffer_as_input() {
+        Router<String> router = new RouterSetup<String>()
+                .add("/foo/bar", "1")
+                .add("/foo/{name}", "2")
+                .build();
+
+        assertOK(router.routeOrNull("/foo/bar"), "1");
+        assertOK(router.routeOrNull(new CharBuffer("/foo/bar")), "1");
+        assertOK(router.routeOrNull(new CharBuffer("/foo/bar/", 0, 8)), "1");
+        assertOK(router.routeOrNull(new CharBuffer("//foo/bar/", 1, 9)), "1");
+        assertOK(router.routeOrNull(new MutableCharBuffer("//foo/bar/", 1, 9)), "1");
+
+        assert404(router.routeOrNull(new CharBuffer("//foo/bar/", 0, 9)));
     }
 
     private static void assertOK(Match<String> match, String tag, String ... variables) {
