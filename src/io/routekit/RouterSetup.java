@@ -29,7 +29,7 @@ public class RouterSetup<T> {
         return add(new StringQuery(query, parser), handler);
     }
 
-    public RouterSetup<T> addManyQueries(Map<Query, T> handlers) {
+    public RouterSetup<T> addAll(Map<Query, T> handlers) {
         for (Map.Entry<Query, T> entry : handlers.entrySet()) {
             add(entry.getKey(), entry.getValue());
         }
@@ -47,7 +47,7 @@ public class RouterSetup<T> {
         return builder.buildRouter(rules);
     }
 
-    record Rule<T>(Query query, T handler) {
+    /*package*/ record Rule<T>(Query query, T handler) {
         boolean isConstant() {
             List<Token> tokens = query.tokens();
             return tokens.size() == 1 && tokens.get(0) instanceof ConstToken;
