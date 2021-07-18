@@ -45,7 +45,7 @@ can reach <b>55m ops/sec</b>, one variable URL - <b>10m ops/sec</b>, two variabl
 <br>
 Environment: AMD Ryzen 5 4600H, 3.00 GHz, <b>single-threaded</b>.
 
-<a href='/test/io/routekit/jmh'>JMH benchmark</a> output below:
+<a href='/src/test/java/io/routekit/jmh'>JMH benchmark</a> output below:
 
 ```
 Benchmark                                 (iterations)   Mode   Samples        Score  Score error    Units
