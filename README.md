@@ -18,7 +18,18 @@ Super-fast and lightweight Java URL router.
 ### Example usage
 
 ```java
-// Setup the rules. `Handler` is any class you want.
+// The setup: map the urls to a handler (can be any class).
+Router<T> router = new RouterSetup<T>()
+    .add("/", ...)
+    .add("/foo", ...)
+    .add("/bar", ...)
+    .build();
+```
+
+For example, if you have a `Handler` hierarchy, implemented by per-page classes (`HomeHandler`, `UserHandler`, etc),
+it might look like this:
+
+```java
 Router<Handler> router = new RouterSetup<Handler>()
     .add("/", new HomeHandler())
     .add("/user", new ListUsersHandler())
@@ -26,17 +37,20 @@ Router<Handler> router = new RouterSetup<Handler>()
     .add("/post", new ListBlogPostsHandler())
     .add("/post/{id}", new BlogPostHandler())
     .add("/post/{id}/{slug}", new BlogPostHandler())
-    .add("/post/{id}/{slug}/comments", new BlogPostHandler())
+        ...
     .build();
+```
 
-// Process incoming url.
-String url = "/post/12345/java-microbenchmark-harness";
+URL navigation is as follows:
+
+```java
 Match<Handler> match = router.routeOrNull(url);
-if (match == null) {
-  return HttpResponseStatus.NOT_FOUND;
-}
+if (match == null)
+    throw new NotFoundException();
 return match.handler().accept(match.variables());
 ```
+
+Note the handler can use the variables map, like `id` -> `123`.
 
 ### Performance
 
