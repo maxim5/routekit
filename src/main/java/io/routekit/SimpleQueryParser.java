@@ -15,7 +15,7 @@ public record SimpleQueryParser(char separator) implements QueryParser {
 
     @Override
     public List<Token> parse(CharArray input) {
-        QueryParseException.failIf(input.isEmpty(), "Input must not be empty");
+        QueryValidator validator = new QueryValidator(separator, input);
         validateBracketSequence(input, VAR_OPEN, VAR_CLOSE);
 
         MutableCharArray array = input.mutableCopy();  // copy to avoid modifying the input
@@ -32,19 +32,13 @@ public record SimpleQueryParser(char separator) implements QueryParser {
 
                 boolean isWildcard = array.at(open + 1) == '*';
                 String varName = array.substring(open + (isWildcard ? 2 : 1), close).toString();
-                QueryParseException.failIf(varName.isEmpty(), "Query contains empty variable: " + input);
-                QueryParseException.failIf(!varName.matches("[a-zA-Z0-9_$]+"), "Query contains invalid variable: " + input);
 
                 Token token = isWildcard ? new WildcardToken(varName) : new SeparableVariableToken(varName, separator);
-                QueryParseException.failIf(
-                        tokens.stream().filter(t -> t instanceof Variable).anyMatch(t -> t.equals(token)),
-                        "Query contains duplicate variables: " + input);
                 tokens.add(token);
 
                 array.offsetStart(close + 1);
-                QueryParseException.failIf(isWildcard && array.isNotEmpty(),
-                        "Query contain the wildcard, but doesn't end with it: " + input);
             } else {
+                validator.checkTokens(tokens);
                 return tokens;
             }
         }

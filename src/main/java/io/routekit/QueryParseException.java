@@ -10,4 +10,10 @@ public class QueryParseException extends RouteException {
             throw new QueryParseException(message);
         }
     }
+
+    public static void failIf(boolean cond, String message, CharSequence input) {
+        if (cond) {
+            throw new QueryParseException("%s: %s".formatted(message, input));
+        }
+    }
 }

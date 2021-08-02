@@ -188,34 +188,36 @@ public class RouterTest {
     // Multiple rules
 
     @Test
-    public void routeOrNull_variables_without_separator_unreachable() {
-        Router<String> router = new RouterSetup<String>()
+    public void routeOrNull_variables_without_separator_invalid() {
+        Assertions.assertThrows(QueryParseException.class, () ->
+            new RouterSetup<String>()
                 .add("/{x}", "1")
-                .add("/{x}{y}", "2")  // unreachable (no workaround)
-                .build();
-
-        assertOK(router.routeOrNull("/foo"), "1", "x=foo");
-        assertOK(router.routeOrNull("/foobar"), "1", "x=foobar");
-        assertOK(router.routeOrNull("/foo-bar"), "1", "x=foo-bar");
-
-        // Not found
-        assert404(router.routeOrNull("/"));
-        assert404(router.routeOrNull("//"));
-        assert404(router.routeOrNull("/foo/"));
-        assert404(router.routeOrNull("/foo//"));
-        assert404(router.routeOrNull("/foo/bar"));
+                .add("/{x}{y}", "2")  // `y` is unreachable
+                .build()
+        );
     }
 
     @Test
-    public void routeOrNull_variables_separated_by_dash_unreachable() {
+    public void routeOrNull_variables_separated_by_dash_invalid() {
+        Assertions.assertThrows(QueryParseException.class, () ->
+            new RouterSetup<String>()
+                .add("/{x}", "1")
+                .add("/{x}-{y}", "2")  // `y` is unreachable (recommended workaround: change variable separator).
+                .build()
+        );
+    }
+
+    @Test
+    public void routeOrNull_variables_separated_by_slash_and_dash() {
         Router<String> router = new RouterSetup<String>()
                 .add("/{x}", "1")
-                .add("/{x}-{y}", "2")  // unreachable (recommended workaround: change variable separator).
+                .add("/{x}/-{y}", "2")
                 .build();
 
         assertOK(router.routeOrNull("/foo"), "1", "x=foo");
         assertOK(router.routeOrNull("/foobar"), "1", "x=foobar");
         assertOK(router.routeOrNull("/foo-bar"), "1", "x=foo-bar");
+        assertOK(router.routeOrNull("/foo/-bar"), "2", "x=foo", "y=bar");
 
         // Not found
         assert404(router.routeOrNull("/"));

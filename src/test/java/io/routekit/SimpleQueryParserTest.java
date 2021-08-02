@@ -26,7 +26,7 @@ public class SimpleQueryParserTest {
         assertOrdered(DEFAULT.parse("{foo}/"), var("foo"), constant("/"));
         assertOrdered(DEFAULT.parse("/{foo}/"), constant("/"), var("foo"), constant("/"));
         assertOrdered(DEFAULT.parse("/foo/{foo}"), constant("/foo/"), var("foo"));
-        assertOrdered(DEFAULT.parse("foo{foo}foo"), constant("foo"), var("foo"), constant("foo"));
+        assertOrdered(DEFAULT.parse("foo{foo}/foo"), constant("foo"), var("foo"), constant("/foo"));
 
         assertOrdered(DEFAULT.parse("{X}"), var("X"));
         assertOrdered(DEFAULT.parse("{XyZ}"), var("XyZ"));
@@ -34,16 +34,14 @@ public class SimpleQueryParserTest {
 
     @Test
     public void parse_two_variables() {
-        assertOrdered(DEFAULT.parse("{foo}{bar}"), var("foo"), var("bar"));
-        assertOrdered(DEFAULT.parse("/{foo}{bar}"), constant("/"), var("foo"), var("bar"));
-        assertOrdered(DEFAULT.parse("{foo}{bar}/"), var("foo"), var("bar"), constant("/"));
         assertOrdered(DEFAULT.parse("{foo}/{bar}"), var("foo"), constant("/"), var("bar"));
         assertOrdered(DEFAULT.parse("/{foo}/{bar}"), constant("/"), var("foo"), constant("/"), var("bar"));
         assertOrdered(DEFAULT.parse("/{foo}/{bar}/"), constant("/"), var("foo"), constant("/"), var("bar"), constant("/"));
 
-        assertOrdered(DEFAULT.parse("{X}{Y}"), var("X"), var("Y"));
-        assertOrdered(DEFAULT.parse("{X}-{Y}"), var("X"), constant("-"), var("Y"));
         assertOrdered(DEFAULT.parse("{X}/{Y}"), var("X"), constant("/"), var("Y"));
+        assertOrdered(DEFAULT.parse("{X}/ {Y}"), var("X"), constant("/ "), var("Y"));
+        assertOrdered(DEFAULT.parse("{X}/_{Y}"), var("X"), constant("/_"), var("Y"));
+        assertOrdered(DEFAULT.parse("{X}/-{Y}"), var("X"), constant("/-"), var("Y"));
     }
 
     @Test
@@ -59,10 +57,7 @@ public class SimpleQueryParserTest {
 
     @Test
     public void parse_wildcard_and_variable() {
-        assertOrdered(DEFAULT.parse("{foo}{*bar}"), var("foo"), wildcard("bar"));
         assertOrdered(DEFAULT.parse("{foo}/{*bar}"), var("foo"), constant("/"), wildcard("bar"));
-        assertOrdered(DEFAULT.parse("/{foo}{*bar}"), constant("/"), var("foo"), wildcard("bar"));
-        assertOrdered(DEFAULT.parse("/foo/{foo}{*bar}"), constant("/foo/"), var("foo"), wildcard("bar"));
         assertOrdered(DEFAULT.parse("/foo/{foo}/{*bar}"), constant("/foo/"), var("foo"), constant("/"), wildcard("bar"));
     }
 
@@ -112,12 +107,26 @@ public class SimpleQueryParserTest {
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{dup}{*dup}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/{dup}/{*dup}"));
 
-        // Wildcard
+        // Wildcard not at the end
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{*bar}/foo"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{*bar}/{foo}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{*bar}{foo}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{*bar}{*bar}"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/foo/{*bar}/"));
         Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/foo/{foo}/{*bar}/"));
+
+        // Vars not separated
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo}{bar}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/{foo}{bar}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo}{bar}/"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{foo}{*bar}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/{foo}{*bar}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("/foo/{foo}{*bar}"));
+
+        // Vars not properly separated
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{X} {Y}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{X}_{Y}"));
+        Assertions.assertThrows(QueryParseException.class, () -> DEFAULT.parse("{X}-{Y}"));
     }
 
     @SafeVarargs
