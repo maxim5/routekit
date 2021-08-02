@@ -1,6 +1,6 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
+import io.routekit.util.CharArray;
 
 public class SeparableVariableToken extends Variable implements Token {
     private final char separator;
@@ -15,8 +15,8 @@ public class SeparableVariableToken extends Variable implements Token {
     }
 
     @Override
-    public int match(CharBuffer buffer) {
-        return handleEmptyMatch(buffer.indexOf(separator, 0, buffer.length()));  // match until separator
+    public int match(CharArray charArray) {
+        return handleEmptyMatch(charArray.indexOf(separator, 0, charArray.length()));  // match until separator
     }
 
     @Override

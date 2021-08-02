@@ -1,28 +1,28 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
+import io.routekit.util.CharArray;
 
 import java.util.Objects;
 
 public class ConstToken implements Token {
-    private final CharBuffer token;
+    private final CharArray token;
 
-    public ConstToken(CharBuffer token) {
+    public ConstToken(CharArray token) {
         this.token = token;
     }
 
     public ConstToken(String token) {
-        this(new CharBuffer(token));
+        this(new CharArray(token));
     }
 
     @Override
-    public int match(CharBuffer buffer) {
+    public int match(CharArray charArray) {
         // Prefix match should work: "/foo".match("/foo/bar") == 4
         // Partial match should not work: "/foo".match("/") == -1
-        return buffer.startsWith(token) ? token.length() : -1;
+        return charArray.startsWith(token) ? token.length() : -1;
     }
 
-    public CharBuffer buffer() {
+    public CharArray buffer() {
         return token;
     }
 

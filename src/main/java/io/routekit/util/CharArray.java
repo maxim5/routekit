@@ -1,5 +1,6 @@
 package io.routekit.util;
 
+import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
@@ -7,46 +8,46 @@ import java.util.stream.IntStream;
 /**
  * A String-like wrapper around `char[]` array, providing efficient slice, join and for-each operations.
  * <p>
- * `CharBuffer` owns the encapsulated char array, but, by default, is immutable (see also {@link MutableCharBuffer}).
+ * `CharArray` owns the encapsulated char array, but, by default, is immutable (see also {@link MutableCharArray}).
  */
-public class CharBuffer implements CharSequence {
+public class CharArray implements CharSequence {
     protected final char[] chars;
     protected int start;
     protected int end;
 
-    public CharBuffer(char[] chars, int start, int end) {
-        assert chars != null : "CharBuffer chars array is null";
-        assert 0 <= start : "CharBuffer start=%d can't be negative".formatted(start);
-        assert start <= end : "CharBuffer start=%d is greater than end=%d".formatted(start, end);
-        assert end <= chars.length : "CharBuffer end=%d is greater than array.length=%d".formatted(end, chars.length);
+    public CharArray(char[] chars, int start, int end) {
+        assert chars != null : "CharArray chars array is null";
+        assert 0 <= start : "CharArray start=%d can't be negative".formatted(start);
+        assert start <= end : "CharArray start=%d is greater than end=%d".formatted(start, end);
+        assert end <= chars.length : "CharArray end=%d is greater than array.length=%d".formatted(end, chars.length);
         this.chars = chars;
         this.start = start;
         this.end = end;
     }
 
-    public CharBuffer(char[] chars) {
+    public CharArray(char[] chars) {
         this(chars, 0, chars.length);
     }
 
-    public CharBuffer(String s, int start, int end) {
+    public CharArray(String s, int start, int end) {
         this(s.toCharArray(), start, end);
     }
 
-    public CharBuffer(String s) {
+    public CharArray(String s) {
         this(s.toCharArray(), 0, s.length());
     }
 
-    public CharBuffer(CharSequence s) {
+    public CharArray(CharSequence s) {
         this(s.toString().toCharArray(), 0, s.length());
     }
 
-    public CharBuffer(java.nio.CharBuffer buffer) {
+    public CharArray(CharBuffer buffer) {
         this(buffer.isReadOnly() ? buffer.toString().toCharArray() : buffer.array(),
              buffer.isReadOnly() ? 0 : buffer.position(),
              buffer.isReadOnly() ? buffer.length() : buffer.position() + buffer.length());
     }
 
-    public CharBuffer(CharBuffer s) {
+    public CharArray(CharArray s) {
         this(s.chars, s.start, s.end);
     }
 
@@ -96,18 +97,18 @@ public class CharBuffer implements CharSequence {
         return asRawBuffer().codePoints();
     }
 
-    public CharBuffer substringFrom(int start) {
+    public CharArray substringFrom(int start) {
         return substring(start, length());
     }
 
-    public CharBuffer substringUntil(int end) {
+    public CharArray substringUntil(int end) {
         return substring(0, end);
     }
 
-    public CharBuffer substring(int start, int end) {
+    public CharArray substring(int start, int end) {
         assert start >= 0 : "Start index can't be negative: %d".formatted(start);
         assert start <= end : "Start index can't be larger than end index: %d >= %d".formatted(start, end);
-        return new CharBuffer(chars, this.start + start, this.start + end);
+        return new CharArray(chars, this.start + start, this.start + end);
     }
 
     @Override
@@ -115,12 +116,12 @@ public class CharBuffer implements CharSequence {
         return substring(start, end);
     }
 
-    public boolean startsWith(CharBuffer prefix) {
+    public boolean startsWith(CharArray prefix) {
         return length() >= prefix.length() &&
                 Arrays.equals(chars, start, start + prefix.length(), prefix.chars, prefix.start, prefix.end);
     }
 
-    public boolean endsWith(CharBuffer suffix) {
+    public boolean endsWith(CharArray suffix) {
         return length() >= suffix.length() &&
                 Arrays.equals(chars, end - suffix.length(), end, suffix.chars, suffix.start, suffix.end);
     }
@@ -157,19 +158,19 @@ public class CharBuffer implements CharSequence {
         return i > length;
     }
 
-    public java.nio.CharBuffer asNioBuffer() {
+    public CharBuffer asNioBuffer() {
         return asRawBuffer().asReadOnlyBuffer();
     }
 
-    protected java.nio.CharBuffer asRawBuffer() {
-        return java.nio.CharBuffer.wrap(chars, start, end - start);  // note: writable!
+    protected CharBuffer asRawBuffer() {
+        return CharBuffer.wrap(chars, start, end - start);  // note: writable!
     }
 
-    public MutableCharBuffer mutable() {
-        return new MutableCharBuffer(chars, start, end);
+    public MutableCharArray mutable() {
+        return new MutableCharArray(chars, start, end);
     }
 
-    public CharBuffer immutable() {
+    public CharArray immutable() {
         return this;
     }
 
@@ -250,34 +251,34 @@ public class CharBuffer implements CharSequence {
     }
 
     // Returns the length of the common prefix
-    public int commonPrefix(CharBuffer buf) {
-        int index = Arrays.mismatch(chars, start, end, buf.chars, buf.start, buf.end);
+    public int commonPrefix(CharArray array) {
+        int index = Arrays.mismatch(chars, start, end, array.chars, array.start, array.end);
         return (index >= 0) ? index : length();
     }
 
     // Returns the length of the common suffix
-    public int commonSuffix(CharBuffer buf) {
+    public int commonSuffix(CharArray array) {
         int i = 1;
-        int limit = Math.min(length(), buf.length());
-        while (i <= limit && chars[end - i] == buf.chars[buf.end - i]) {
+        int limit = Math.min(length(), array.length());
+        while (i <= limit && chars[end - i] == array.chars[array.end - i]) {
             i++;
         }
         return i - 1;
     }
 
-    public static CharBuffer join(CharBuffer lhs, CharBuffer rhs) {
+    public static CharArray join(CharArray lhs, CharArray rhs) {
         if (lhs.chars == rhs.chars && lhs.end == rhs.start) {
-            return new CharBuffer(lhs.chars, lhs.start, rhs.end);
+            return new CharArray(lhs.chars, lhs.start, rhs.end);
         }
-        return new CharBuffer(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
+        return new CharArray(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
     }
 
-    public CharBuffer cutPrefix(CharBuffer prefix) {
+    public CharArray cutPrefix(CharArray prefix) {
         int len = commonPrefix(prefix);
         return len < prefix.length() ? this : substringFrom(len);
     }
 
-    public CharBuffer cutSuffix(CharBuffer suffix) {
+    public CharArray cutSuffix(CharArray suffix) {
         int len = commonSuffix(suffix);
         return len < suffix.length() ? this : substringUntil(length() - len);
     }
@@ -289,7 +290,7 @@ public class CharBuffer implements CharSequence {
 
     @Override
     public boolean equals(Object o) {
-        return this == o || o instanceof CharBuffer that && Arrays.equals(chars, start, end, that.chars, that.start, that.end);
+        return this == o || o instanceof CharArray that && Arrays.equals(chars, start, end, that.chars, that.start, that.end);
     }
 
     @Override

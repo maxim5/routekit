@@ -1,48 +1,50 @@
 package io.routekit.util;
 
-public class MutableCharBuffer extends CharBuffer {
-    public MutableCharBuffer(char[] chars, int start, int end) {
+import java.nio.CharBuffer;
+
+public class MutableCharArray extends CharArray {
+    public MutableCharArray(char[] chars, int start, int end) {
         super(chars, start, end);
     }
 
-    public MutableCharBuffer(char[] chars) {
+    public MutableCharArray(char[] chars) {
         super(chars);
     }
 
-    public MutableCharBuffer(String s, int start, int end) {
+    public MutableCharArray(String s, int start, int end) {
         super(s, start, end);
     }
 
-    public MutableCharBuffer(String s) {
+    public MutableCharArray(String s) {
         super(s);
     }
 
-    public MutableCharBuffer(CharSequence s) {
+    public MutableCharArray(CharSequence s) {
         super(s);
     }
 
-    public MutableCharBuffer(CharBuffer s) {
+    public MutableCharArray(CharArray s) {
         super(s);
     }
 
-    public MutableCharBuffer(java.nio.CharBuffer buffer) {
+    public MutableCharArray(CharBuffer buffer) {
         super(buffer);
     }
 
-    public java.nio.CharBuffer asNioBuffer() {
+    public CharBuffer asNioBuffer() {
         return asRawBuffer();
     }
 
-    public MutableCharBuffer mutable() {
+    public MutableCharArray mutable() {
         return this;
     }
 
-    public CharBuffer immutable() {
-        return new CharBuffer(chars, start, end);
+    public CharArray immutable() {
+        return new CharArray(chars, start, end);
     }
 
-    public MutableCharBuffer mutableSubstring(int start, int end) {
-        return new MutableCharBuffer(chars, this.start + start, this.start + end);
+    public MutableCharArray mutableSubstring(int start, int end) {
+        return new MutableCharArray(chars, this.start + start, this.start + end);
     }
 
     public void reset() {
@@ -68,24 +70,24 @@ public class MutableCharBuffer extends CharBuffer {
         end -= offset;
     }
 
-    public void offsetPrefix(CharBuffer prefix) {
+    public void offsetPrefix(CharArray prefix) {
         int len = commonPrefix(prefix);
         if (len == prefix.length()) {
             offsetStart(len);
         }
     }
 
-    public void offsetSuffix(CharBuffer suffix) {
+    public void offsetSuffix(CharArray suffix) {
         int len = commonSuffix(suffix);
         if (len == suffix.length()) {
             offsetEnd(len);
         }
     }
 
-    public static MutableCharBuffer join(CharBuffer lhs, CharBuffer rhs) {
+    public static MutableCharArray join(CharArray lhs, CharArray rhs) {
         if (lhs.chars == rhs.chars && lhs.end == rhs.start) {
-            return new MutableCharBuffer(lhs.chars, lhs.start, rhs.end);
+            return new MutableCharArray(lhs.chars, lhs.start, rhs.end);
         }
-        return new MutableCharBuffer(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
+        return new MutableCharArray(new StringBuilder(lhs.length() + rhs.length()).append(lhs).append(rhs));
     }
 }

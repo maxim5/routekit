@@ -1,6 +1,6 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
+import io.routekit.util.CharArray;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -39,13 +39,13 @@ public class RouterBuilder {
     }
 
     public <T> Router<T> buildRouter(List<RouterSetup.Rule<T>> rules) {
-        Map<CharBuffer, T> quickMatchIndex = buildQuickMatchIndex(rules);
+        Map<CharArray, T> quickMatchIndex = buildQuickMatchIndex(rules);
         Router.Node<T> root = buildStateMachine(rules);
         log.log(Level.FINEST, () -> "Using quick-match index of size %d".formatted(quickMatchIndex.size()));
         return new Router<>(quickMatchIndex, root);
     }
 
-    /*package*/ <T> Map<CharBuffer, T> buildQuickMatchIndex(List<RouterSetup.Rule<T>> rules) {
+    /*package*/ <T> Map<CharArray, T> buildQuickMatchIndex(List<RouterSetup.Rule<T>> rules) {
         return (quickMatchForConst) ?
             rules.stream()
                 .filter(RouterSetup.Rule::isConstant)
@@ -102,7 +102,7 @@ public class RouterBuilder {
     }
 
     private <T> boolean retokenizeByCommonPrefix(List<Sequence<T>> sequences) {
-        CharBuffer commonPrefix = sequences.stream()
+        CharArray commonPrefix = sequences.stream()
                 .map(seq -> seq.tokens.peek() instanceof ConstToken constToken ? constToken.buffer() : null)
                 .reduce(null, (lhs, rhs) -> {
                     if (lhs == null) return rhs;
@@ -130,7 +130,7 @@ public class RouterBuilder {
         sequences.stream()
                 .filter(seq -> seq.tokens.peek() instanceof ConstToken)
                 .forEach(sequence -> {
-                    CharBuffer buffer = ((ConstToken) sequence.tokens.peek()).buffer();
+                    CharArray buffer = ((ConstToken) sequence.tokens.peek()).buffer();
                     int index = buffer.indexOf(separator, 1);
                     if (index >= 0) {
                         sequence.tokens.poll();
@@ -147,7 +147,7 @@ public class RouterBuilder {
             }
             Router.Node<T> child = node.next()[0];
             if (node.token() instanceof ConstToken lhs && child.token() instanceof ConstToken rhs) {
-                CharBuffer join = CharBuffer.join(lhs.buffer(), rhs.buffer());
+                CharArray join = CharArray.join(lhs.buffer(), rhs.buffer());
                 return new Router.Node<>(new ConstToken(join), child.next(), child.terminalRule());
             }
             return node;
@@ -156,7 +156,7 @@ public class RouterBuilder {
 
     private static class RootToken implements Token {
         @Override
-        public int match(CharBuffer buffer) {
+        public int match(CharArray charArray) {
             return 0;
         }
 

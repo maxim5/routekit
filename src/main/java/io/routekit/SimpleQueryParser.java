@@ -1,7 +1,7 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
-import io.routekit.util.MutableCharBuffer;
+import io.routekit.util.CharArray;
+import io.routekit.util.MutableCharArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,24 +14,24 @@ public record SimpleQueryParser(char separator) implements QueryParser {
     public static final SimpleQueryParser DEFAULT = new SimpleQueryParser(DEFAULT_SEPARATOR);
 
     @Override
-    public List<Token> parse(CharBuffer input) {
+    public List<Token> parse(CharArray input) {
         QueryParseException.failIf(input.isEmpty(), "Input must not be empty");
         validateBracketSequence(input, VAR_OPEN, VAR_CLOSE);
 
-        MutableCharBuffer buffer = new MutableCharBuffer(input);  // copy to avoid modifying the input
+        MutableCharArray array = new MutableCharArray(input);  // copy to avoid modifying the input
         ArrayList<Token> tokens = new ArrayList<>();
         while (true) {
-            int length = buffer.length();
-            int open = buffer.indexOf(VAR_OPEN, 0, length);  // match until variable start
+            int length = array.length();
+            int open = array.indexOf(VAR_OPEN, 0, length);  // match until variable start
             if (open > 0) {
-                tokens.add(new ConstToken(buffer.substringUntil(open)));
+                tokens.add(new ConstToken(array.substringUntil(open)));
             }
             if (open < length) {
-                int close = buffer.indexOf(VAR_CLOSE, open);
+                int close = array.indexOf(VAR_CLOSE, open);
                 QueryParseException.failIf(close < 0, "Failed to parse variables in the query: " + input);
 
-                boolean isWildcard = buffer.at(open + 1) == '*';
-                String varName = buffer.substring(open + (isWildcard ? 2 : 1), close).toString();
+                boolean isWildcard = array.at(open + 1) == '*';
+                String varName = array.substring(open + (isWildcard ? 2 : 1), close).toString();
                 QueryParseException.failIf(varName.isEmpty(), "Query contains empty variable: " + input);
                 QueryParseException.failIf(!varName.matches("[a-zA-Z0-9_$]+"), "Query contains invalid variable: " + input);
 
@@ -41,8 +41,8 @@ public record SimpleQueryParser(char separator) implements QueryParser {
                         "Query contains duplicate variables: " + input);
                 tokens.add(token);
 
-                buffer.offsetStart(close + 1);
-                QueryParseException.failIf(isWildcard && buffer.isNotEmpty(),
+                array.offsetStart(close + 1);
+                QueryParseException.failIf(isWildcard && array.isNotEmpty(),
                         "Query contain the wildcard, but doesn't end with it: " + input);
             } else {
                 return tokens;
@@ -50,7 +50,7 @@ public record SimpleQueryParser(char separator) implements QueryParser {
         }
     }
 
-    private static void validateBracketSequence(CharBuffer input, int open, int close) {
+    private static void validateBracketSequence(CharArray input, int open, int close) {
         AtomicInteger balance = new AtomicInteger();  // wish I could use an int here...
         input.forEach(value -> {
             if (value == open) {

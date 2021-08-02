@@ -1,7 +1,7 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
-import io.routekit.util.MutableCharBuffer;
+import io.routekit.util.CharArray;
+import io.routekit.util.MutableCharArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -478,10 +478,10 @@ public class RouterTest {
                 .add("/foo/{name}", "1")
                 .build();
 
-        assert404(router.routeOrNull(new CharBuffer("/bar/foo/name")));
-        assertOK(router.routeOrNull(new CharBuffer("/bar/foo/name").substringFrom(4)), "1", "name=name");
-        assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v")), "1", Collections.singletonMap("name", "name?k=v"));
-        assertOK(router.routeOrNull(new CharBuffer("/foo/name?k=v").substringUntil(9)), "1", "name=name");
+        assert404(router.routeOrNull(new CharArray("/bar/foo/name")));
+        assertOK(router.routeOrNull(new CharArray("/bar/foo/name").substringFrom(4)), "1", "name=name");
+        assertOK(router.routeOrNull(new CharArray("/foo/name?k=v")), "1", Collections.singletonMap("name", "name?k=v"));
+        assertOK(router.routeOrNull(new CharArray("/foo/name?k=v").substringUntil(9)), "1", "name=name");
     }
 
     @Test
@@ -492,12 +492,12 @@ public class RouterTest {
                 .build();
 
         assertOK(router.routeOrNull("/foo/bar"), "1");
-        assertOK(router.routeOrNull(new CharBuffer("/foo/bar")), "1");
-        assertOK(router.routeOrNull(new CharBuffer("/foo/bar/", 0, 8)), "1");
-        assertOK(router.routeOrNull(new CharBuffer("//foo/bar/", 1, 9)), "1");
-        assertOK(router.routeOrNull(new MutableCharBuffer("//foo/bar/", 1, 9)), "1");
+        assertOK(router.routeOrNull(new CharArray("/foo/bar")), "1");
+        assertOK(router.routeOrNull(new CharArray("/foo/bar/", 0, 8)), "1");
+        assertOK(router.routeOrNull(new CharArray("//foo/bar/", 1, 9)), "1");
+        assertOK(router.routeOrNull(new MutableCharArray("//foo/bar/", 1, 9)), "1");
 
-        assert404(router.routeOrNull(new CharBuffer("//foo/bar/", 0, 9)));
+        assert404(router.routeOrNull(new CharArray("//foo/bar/", 0, 9)));
     }
 
     private static void assertOK(Match<String> match, String tag, String ... variables) {
@@ -513,12 +513,12 @@ public class RouterTest {
     }
 
     private static Match<String> match(String tag, String ... variables) {
-        Map<String, CharBuffer> map = Arrays.stream(variables)
+        Map<String, CharArray> map = Arrays.stream(variables)
                 .map(var -> var.split("=", -1))
                 .filter(split -> split.length == 2)
                 .collect(Collectors.toMap(
                         split -> split[0],
-                        split -> new CharBuffer(split[1]),
+                        split -> new CharArray(split[1]),
                         (val1, val2) -> { throw new IllegalStateException("Duplicate values: " + val1 + " " + val2); },
                         LinkedHashMap::new)
                 );
@@ -526,12 +526,12 @@ public class RouterTest {
     }
 
     private static <T extends CharSequence> Match<String> match(String tag, Map<String, T> variables) {
-        Map<String, CharBuffer> buffers = variables.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new CharBuffer(e.getValue())));
+        Map<String, CharArray> buffers = variables.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new CharArray(e.getValue())));
         return makeMatch(tag, buffers);
     }
 
-    private static Match<String> makeMatch(String tag, Map<String, CharBuffer> variables) {
+    private static Match<String> makeMatch(String tag, Map<String, CharArray> variables) {
         return new Match<>(tag, variables);
     }
 }

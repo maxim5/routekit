@@ -1,9 +1,9 @@
 package io.routekit;
 
-import io.routekit.util.CharBuffer;
+import io.routekit.util.CharArray;
 
 public interface Token {
-    // Returns the length of the match with the {@link buffer}.
+    // Returns the length of the match with the {@link charArray}.
     // Result is negative if doesn't match.
-    int match(CharBuffer buffer);
+    int match(CharArray charArray);
 }
