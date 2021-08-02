@@ -2,7 +2,7 @@ package io.routekit;
 
 import io.routekit.util.CharArray;
 
-public class WildcardToken extends Variable implements Token {
+public final class WildcardToken extends Variable implements Token {
     public WildcardToken(String name) {
         super(name);
     }

@@ -2,7 +2,7 @@ package io.routekit;
 
 import io.routekit.util.CharArray;
 
-public class SeparableVariableToken extends Variable implements Token {
+public final class SeparableVariableToken extends Variable implements Token {
     private final char separator;
 
     public SeparableVariableToken(String name, char separator) {

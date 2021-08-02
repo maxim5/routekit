@@ -3,7 +3,7 @@ package io.routekit;
 import java.util.List;
 import java.util.Objects;
 
-public class StringQuery implements Query {
+public final class StringQuery implements Query {
     private final String query;
     private final List<Token> tokens;
 
