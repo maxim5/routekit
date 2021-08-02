@@ -3,9 +3,7 @@ package io.routekit;
 import io.routekit.util.CharArray;
 import io.routekit.util.MutableCharArray;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,8 +74,22 @@ public class Router<T> {
     }
 
     /*package*/ record Node<T>(Token token, Node<T>[] next, RouterSetup.Rule<T> terminalRule) {
+        Node {
+            List<Node<T>> variables = Arrays.stream(next).filter(Node::isVar).toList();
+            if (variables.size() > 1) {
+                throw new RouteException(
+                        ("A node `%s` can not have several follow-up variable tokens rules: " +
+                        "%s (one of the variables will never match)").formatted(token, variables)
+                );
+            }
+        }
+
         public boolean isTerminal() {
             return terminalRule != null;  // Note: non-leaf nodes can be terminal.
+        }
+
+        private boolean isVar() {
+            return token instanceof SeparableVariableToken;
         }
     }
 }

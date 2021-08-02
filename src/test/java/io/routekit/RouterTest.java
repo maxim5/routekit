@@ -228,27 +228,13 @@ public class RouterTest {
     }
 
     @Test
-    public void routeOrNull_variables_with_same_prefix_unreachable() {
-        Router<String> router = new RouterSetup<String>()
+    public void routeOrNull_variables_with_same_prefix_invalid() {
+        Assertions.assertThrows(RouteException.class, () ->
+            new RouterSetup<String>()
                 .add("/foo/{x}", "1")
-                .add("/foo/{y}", "2")  // unreachable (no workaround)
-                .build();
-
-        assertOK(router.routeOrNull("/foo/foo"), "1", "x=foo");
-        assertOK(router.routeOrNull("/foo/FOO"), "1", "x=FOO");
-        assertOK(router.routeOrNull("/foo/_"), "1", "x=_");
-
-        // Not found
-        assert404(router.routeOrNull("/foo/"));
-        assert404(router.routeOrNull("/"));
-        assert404(router.routeOrNull("//"));
-        assert404(router.routeOrNull("foo/"));
-        assert404(router.routeOrNull("/foobar"));
-
-        // Doesn't match the slash
-        assert404(router.routeOrNull("foo//"));
-        assert404(router.routeOrNull("foo/bar/"));
-        assert404(router.routeOrNull("foo/bar//"));
+                .add("/foo/{y}", "2")  // `y` is unreachable
+                .build()
+        );
     }
 
     @Test
