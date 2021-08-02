@@ -43,8 +43,7 @@ import java.util.function.Consumer;
                     if (token instanceof ConstToken constToken) {
                         QueryParseException.failIf(
                             !constToken.buffer().startsWith(separator),
-                            "Query contains two variables not separated by a '%s', making the second variables unmatchable".formatted(separator),
-                            input);
+                            "Query contains a variable not followed by a '%s' separator".formatted(separator), input);
                     }
                 }
                 wasVar = isVar;
