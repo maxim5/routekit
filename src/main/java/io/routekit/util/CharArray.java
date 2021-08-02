@@ -167,11 +167,19 @@ public class CharArray implements CharSequence {
     }
 
     public MutableCharArray mutable() {
+        return mutableCopy();
+    }
+
+    public MutableCharArray mutableCopy() {
         return new MutableCharArray(chars, start, end);
     }
 
     public CharArray immutable() {
         return this;
+    }
+
+    public CharArray immutableCopy() {
+        return new CharArray(this);
     }
 
     public int indexOf(char ch) {

@@ -43,7 +43,7 @@ public class Router<T> {
     }
 
     private static <T> Match<T> navigate(CharArray input, Node<T> current) {
-        MutableCharArray array = input.mutable();
+        MutableCharArray array = input.mutableCopy();  // copy to avoid modifying the input
         Map<String, CharArray> vars = new LinkedHashMap<>();  // preserve the order
 
         while (array.isNotEmpty()) {

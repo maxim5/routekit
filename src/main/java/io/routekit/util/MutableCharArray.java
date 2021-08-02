@@ -31,14 +31,17 @@ public class MutableCharArray extends CharArray {
         super(buffer);
     }
 
+    @Override
     public CharBuffer asNioBuffer() {
         return asRawBuffer();
     }
 
+    @Override
     public MutableCharArray mutable() {
         return this;
     }
 
+    @Override
     public CharArray immutable() {
         return new CharArray(chars, start, end);
     }

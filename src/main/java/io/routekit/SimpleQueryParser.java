@@ -18,7 +18,7 @@ public record SimpleQueryParser(char separator) implements QueryParser {
         QueryParseException.failIf(input.isEmpty(), "Input must not be empty");
         validateBracketSequence(input, VAR_OPEN, VAR_CLOSE);
 
-        MutableCharArray array = new MutableCharArray(input);  // copy to avoid modifying the input
+        MutableCharArray array = input.mutableCopy();  // copy to avoid modifying the input
         ArrayList<Token> tokens = new ArrayList<>();
         while (true) {
             int length = array.length();
