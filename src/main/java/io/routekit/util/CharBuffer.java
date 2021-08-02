@@ -192,6 +192,25 @@ public class CharBuffer implements CharSequence {
         return def;
     }
 
+    public int indexOfAny(char ch1, char ch2) {
+        return indexOfAny(ch1, ch2, 0, -1);
+    }
+
+    public int indexOfAny(char ch1, char ch2, int from) {
+        return indexOfAny(ch1, ch2, from, -1);
+    }
+
+    public int indexOfAny(char ch1, char ch2, int from, int def) {
+        assert from >= 0 : "From index can't be negative: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
+        for (int i = start + from; i < end; ++i) {
+            if (chars[i] == ch1 || chars[i] == ch2) {
+                return i - start;
+            }
+        }
+        return def;
+    }
+
     public int lastIndexOf(char ch) {
         return lastIndexOf(ch, end - 1, -1);
     }
@@ -205,6 +224,25 @@ public class CharBuffer implements CharSequence {
         assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
         for (int i = from; i >= start; --i) {
             if (chars[i] == ch) {
+                return i - start;
+            }
+        }
+        return def;
+    }
+
+    public int lastIndexOfAny(char ch1, char ch2) {
+        return lastIndexOfAny(ch1, ch2, end - 1, -1);
+    }
+
+    public int lastIndexOfAny(char ch1, char ch2, int from) {
+        return lastIndexOfAny(ch1, ch2, from, -1);
+    }
+
+    public int lastIndexOfAny(char ch1, char ch2, int from, int def) {
+        assert from >= 0 : "From index can't be negative: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
+        for (int i = from; i >= start; --i) {
+            if (chars[i] == ch1 || chars[i] == ch2) {
                 return i - start;
             }
         }

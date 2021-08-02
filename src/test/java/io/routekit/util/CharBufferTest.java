@@ -92,6 +92,34 @@ public class CharBufferTest {
     }
 
     @Test
+    public void indexOfAny() {
+        CharBuffer buffer = new CharBuffer("foo-bar-baz");
+
+        Assertions.assertEquals(0, buffer.indexOfAny('f', 'o'));
+        Assertions.assertEquals(1, buffer.indexOfAny('o', 'o'));
+        Assertions.assertEquals(3, buffer.indexOfAny('a', '-'));
+        Assertions.assertEquals(5, buffer.indexOfAny('a', 'z'));
+        Assertions.assertEquals(10, buffer.indexOfAny('z', 'w'));
+        Assertions.assertEquals(-1, buffer.indexOfAny('x', 'y'));
+
+        Assertions.assertEquals(-1, buffer.indexOfAny('f', 'g', 1));
+        Assertions.assertEquals(-2, buffer.indexOfAny('f', 'g', 1, -2));
+        Assertions.assertEquals(11, buffer.indexOfAny('f', 'g', 1, buffer.length()));
+        Assertions.assertEquals(1, buffer.indexOfAny('o', 'a', 1));
+        Assertions.assertEquals(1, buffer.indexOfAny('o', 'a', 1, -2));
+        Assertions.assertEquals(3, buffer.indexOfAny('-', 'a', 3));
+        Assertions.assertEquals(3, buffer.indexOfAny('-', 'a', 3, buffer.length()));
+        Assertions.assertEquals(7, buffer.indexOfAny('z', '-', 4));
+        Assertions.assertEquals(7, buffer.indexOfAny('z', '-', 4, buffer.length()));
+        Assertions.assertEquals(7, buffer.indexOfAny('z', '-', 4, -2));
+        Assertions.assertEquals(7, buffer.indexOfAny('z', '-', 7, buffer.length()));
+        Assertions.assertEquals(9, buffer.indexOfAny('a', '-', 8, buffer.length()));
+        Assertions.assertEquals(10, buffer.indexOfAny('z', '-', 8, buffer.length()));
+        Assertions.assertEquals(11, buffer.indexOfAny('z', '-', 11, buffer.length()));
+        Assertions.assertEquals(11, buffer.indexOfAny('o', '-', 8, buffer.length()));
+    }
+
+    @Test
     public void lastIndexOf() {
         CharBuffer buffer = new CharBuffer("foo-bar-baz");
 
@@ -110,6 +138,32 @@ public class CharBufferTest {
         Assertions.assertEquals(5, buffer.lastIndexOf('a', 5));
         Assertions.assertEquals(-1, buffer.lastIndexOf('a', 4));
         Assertions.assertEquals(-2, buffer.lastIndexOf('a', 4, -2));
+    }
+
+    @Test
+    public void lastIndexOfAny() {
+        CharBuffer buffer = new CharBuffer("foo-bar-baz");
+
+        Assertions.assertEquals(0, buffer.lastIndexOfAny('f', 'g'));
+        Assertions.assertEquals(2, buffer.lastIndexOfAny('f', 'o'));
+        Assertions.assertEquals(2, buffer.lastIndexOfAny('o', 'f'));
+        Assertions.assertEquals(2, buffer.lastIndexOfAny('o', 'x'));
+        Assertions.assertEquals(7, buffer.lastIndexOfAny('-', 'o'));
+        Assertions.assertEquals(9, buffer.lastIndexOfAny('-', 'a'));
+        Assertions.assertEquals(10, buffer.lastIndexOfAny('-', 'z'));
+        Assertions.assertEquals(-1, buffer.lastIndexOfAny('x', 'y'));
+
+        Assertions.assertEquals(0, buffer.lastIndexOfAny('f', 'g', 10));
+        Assertions.assertEquals(0, buffer.lastIndexOfAny('f', 'g', 10, -1));
+        Assertions.assertEquals(10, buffer.lastIndexOfAny('f', 'z', 10));
+        Assertions.assertEquals(10, buffer.lastIndexOfAny('f', 'z', 10, -1));
+        Assertions.assertEquals(10, buffer.lastIndexOfAny('a', 'z', 10));
+        Assertions.assertEquals(9, buffer.lastIndexOfAny('a', 'r', 10));
+        Assertions.assertEquals(9, buffer.lastIndexOfAny('a', 'z', 9));
+        Assertions.assertEquals(5, buffer.lastIndexOfAny('a', 'z', 8));
+        Assertions.assertEquals(5, buffer.lastIndexOfAny('a', 'r', 5));
+        Assertions.assertEquals(-1, buffer.lastIndexOfAny('a', 'r', 4));
+        Assertions.assertEquals(-2, buffer.lastIndexOfAny('a', 'r', 4, -2));
     }
 
     @Test
