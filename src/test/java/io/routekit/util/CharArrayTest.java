@@ -94,6 +94,17 @@ public class CharArrayTest {
     }
 
     @Test
+    public void indexOf_subarray() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertEquals(-1, array.indexOf('f'));
+        Assertions.assertEquals(-1, array.indexOf('a'));
+        Assertions.assertEquals(2, array.indexOf('b'));
+        Assertions.assertEquals(-1, array.indexOf('o', 3));
+        Assertions.assertEquals(-2, array.indexOf('o', 3, -2));
+    }
+
+    @Test
     public void indexOfAny() {
         CharArray array = new CharArray("foo-bar-baz");
 
@@ -122,6 +133,16 @@ public class CharArrayTest {
     }
 
     @Test
+    public void indexOfAny_subarray() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertEquals(-1, array.indexOfAny('f', 'a'));
+        Assertions.assertEquals(2, array.indexOfAny('f', 'b'));
+        Assertions.assertEquals(-1, array.indexOfAny('o', 'o', 3));
+        Assertions.assertEquals(-2, array.indexOfAny('o', 'o', 3, -2));
+    }
+
+    @Test
     public void lastIndexOf() {
         CharArray array = new CharArray("foo-bar-baz");
 
@@ -140,6 +161,22 @@ public class CharArrayTest {
         Assertions.assertEquals(5, array.lastIndexOf('a', 5));
         Assertions.assertEquals(-1, array.lastIndexOf('a', 4));
         Assertions.assertEquals(-2, array.lastIndexOf('a', 4, -2));
+    }
+
+    @Test
+    public void lastIndexOf_subarray() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertEquals(-1, array.lastIndexOf('f'));
+        Assertions.assertEquals(-1, array.lastIndexOf('a'));
+        Assertions.assertEquals(-1, array.lastIndexOf('a', 2));
+        Assertions.assertEquals(-1, array.lastIndexOf('a', 3));
+        Assertions.assertEquals(2, array.lastIndexOf('b'));
+        Assertions.assertEquals(2, array.lastIndexOf('b', 2));
+        Assertions.assertEquals(2, array.lastIndexOf('b', 3));
+        Assertions.assertEquals(0, array.lastIndexOf('o', 0));
+        Assertions.assertEquals(1, array.lastIndexOf('o', 3));
+        Assertions.assertEquals(1, array.lastIndexOf('o', 3, -2));
     }
 
     @Test
@@ -166,6 +203,22 @@ public class CharArrayTest {
         Assertions.assertEquals(5, array.lastIndexOfAny('a', 'r', 5));
         Assertions.assertEquals(-1, array.lastIndexOfAny('a', 'r', 4));
         Assertions.assertEquals(-2, array.lastIndexOfAny('a', 'r', 4, -2));
+    }
+
+    @Test
+    public void lastIndexOfAny_subarray() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertEquals(-1, array.lastIndexOfAny('f', 'a'));
+        Assertions.assertEquals(-1, array.lastIndexOfAny('a', 'f'));
+        Assertions.assertEquals(-1, array.lastIndexOfAny('a', 'f', 2));
+        Assertions.assertEquals(-1, array.lastIndexOfAny('a', 'f', 3));
+        Assertions.assertEquals(2, array.lastIndexOfAny('b', 'o'));
+        Assertions.assertEquals(2, array.lastIndexOfAny('b', 'o', 2));
+        Assertions.assertEquals(2, array.lastIndexOfAny('b', 'o', 3));
+        Assertions.assertEquals(0, array.lastIndexOfAny('o', 'f', 0));
+        Assertions.assertEquals(1, array.lastIndexOfAny('o', 'f', 3));
+        Assertions.assertEquals(1, array.lastIndexOfAny('o', 'f', 3, -2));
     }
 
     @Test

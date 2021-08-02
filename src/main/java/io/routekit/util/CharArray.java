@@ -191,8 +191,8 @@ public class CharArray implements CharSequence {
     }
 
     public int indexOf(char ch, int from, int def) {
-        assert from >= 0 : "From index can't be negative: %d".formatted(from);
-        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
+        assert from >= 0 && from <= length() : "From index is out of array bounds: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within array bounds: %d".formatted(def);
         for (int i = start + from; i < end; ++i) {
             if (chars[i] == ch) {
                 return i - start;
@@ -210,8 +210,8 @@ public class CharArray implements CharSequence {
     }
 
     public int indexOfAny(char ch1, char ch2, int from, int def) {
-        assert from >= 0 : "From index can't be negative: %d".formatted(from);
-        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
+        assert from >= 0 && from <= length() : "From index is out of array bounds: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within array bounds: %d".formatted(def);
         for (int i = start + from; i < end; ++i) {
             if (chars[i] == ch1 || chars[i] == ch2) {
                 return i - start;
@@ -221,7 +221,7 @@ public class CharArray implements CharSequence {
     }
 
     public int lastIndexOf(char ch) {
-        return lastIndexOf(ch, end - 1, -1);
+        return lastIndexOf(ch, length() - 1, -1);
     }
 
     public int lastIndexOf(char ch, int from) {
@@ -229,9 +229,9 @@ public class CharArray implements CharSequence {
     }
 
     public int lastIndexOf(char ch, int from, int def) {
-        assert from >= 0 : "From index can't be negative: %d".formatted(from);
-        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
-        for (int i = from; i >= start; --i) {
+        assert from >= 0 && from <= length() : "From index is out of array bounds: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within array bounds: %d".formatted(def);
+        for (int i = Math.min(start + from, end - 1); i >= start; --i) {
             if (chars[i] == ch) {
                 return i - start;
             }
@@ -240,7 +240,7 @@ public class CharArray implements CharSequence {
     }
 
     public int lastIndexOfAny(char ch1, char ch2) {
-        return lastIndexOfAny(ch1, ch2, end - 1, -1);
+        return lastIndexOfAny(ch1, ch2, length() - 1, -1);
     }
 
     public int lastIndexOfAny(char ch1, char ch2, int from) {
@@ -248,9 +248,9 @@ public class CharArray implements CharSequence {
     }
 
     public int lastIndexOfAny(char ch1, char ch2, int from, int def) {
-        assert from >= 0 : "From index can't be negative: %d".formatted(from);
-        assert def < 0 || def >= length() : "Default index can't be within buffer bounds: %d".formatted(def);
-        for (int i = from; i >= start; --i) {
+        assert from >= 0 && from <= length() : "From index is out of array bounds: %d".formatted(from);
+        assert def < 0 || def >= length() : "Default index can't be within array bounds: %d".formatted(def);
+        for (int i = Math.min(start + from, end - 1); i >= start; --i) {
             if (chars[i] == ch1 || chars[i] == ch2) {
                 return i - start;
             }
