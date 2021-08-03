@@ -272,6 +272,10 @@ public class CharArray implements CharSequence {
         return (index >= 0) ? index : length();
     }
 
+    public int commonPrefix(CharSequence str) {
+        return commonPrefix(new CharArray(str));
+    }
+
     // Returns the length of the common suffix
     public int commonSuffix(CharArray array) {
         int i = 1;
@@ -280,6 +284,10 @@ public class CharArray implements CharSequence {
             i++;
         }
         return i - 1;
+    }
+
+    public int commonSuffix(CharSequence str) {
+        return commonSuffix(new CharArray(str));
     }
 
     public static CharArray join(CharArray lhs, CharArray rhs) {
@@ -294,9 +302,17 @@ public class CharArray implements CharSequence {
         return len < prefix.length() ? this : substringFrom(len);
     }
 
+    public CharArray cutPrefix(CharSequence prefix) {
+        return cutPrefix(new CharArray(prefix));
+    }
+
     public CharArray cutSuffix(CharArray suffix) {
         int len = commonSuffix(suffix);
         return len < suffix.length() ? this : substringUntil(length() - len);
+    }
+
+    public CharArray cutSuffix(CharSequence suffix) {
+        return cutSuffix(new CharArray(suffix));
     }
 
     @Override

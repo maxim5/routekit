@@ -245,6 +245,10 @@ public class CharArrayTest {
 
     @Test
     public void commonPrefix() {
+        Assertions.assertEquals(0, new CharArray("foo").commonPrefix("bar"));
+        Assertions.assertEquals(2, new CharArray("bar").commonPrefix("baz"));
+        Assertions.assertEquals(3, new CharArray("foo").commonPrefix("foo"));
+
         Assertions.assertEquals(0, new CharArray("foo").commonPrefix(new CharArray("bar")));
         Assertions.assertEquals(2, new CharArray("bar").commonPrefix(new CharArray("baz")));
 
@@ -276,6 +280,10 @@ public class CharArrayTest {
 
     @Test
     public void commonSuffix() {
+        Assertions.assertEquals(0, new CharArray("foo").commonSuffix("bar"));
+        Assertions.assertEquals(2, new CharArray("foo").commonSuffix("boo"));
+        Assertions.assertEquals(3, new CharArray("foo").commonSuffix("foo"));
+
         Assertions.assertEquals(0, new CharArray("foo").commonSuffix(new CharArray("bar")));
         Assertions.assertEquals(2, new CharArray("foo").commonSuffix(new CharArray("boo")));
 
