@@ -241,7 +241,7 @@ public class RouterTest {
     public void routeOrNull_variables_with_same_part_unreachable() {
         Router<String> router = new RouterSetup<String>()
                 .add("/user/{name}", "1")
-                .add("/user/id{id}", "2")  // unreachable (no workaround)
+                .add("/user/id{id}", "2")  // unreachable (workaround: add a separator)
                 .build();
 
         assertOK(router.routeOrNull("/user/foo"), "1", "name=foo");
@@ -258,7 +258,7 @@ public class RouterTest {
     @Test
     public void routeOrNull_variables_with_same_part_swapped_unreachable() {
         Router<String> router = new RouterSetup<String>()
-                .add("/user/id{id}", "2")  // unreachable (no workaround)
+                .add("/user/id{id}", "2")  // unreachable (workaround: add a separator)
                 .add("/user/{name}", "1")
                 .build();
 
