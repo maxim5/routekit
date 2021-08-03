@@ -80,10 +80,22 @@ public class MutableCharArray extends CharArray {
         }
     }
 
+    public void offsetPrefix(char ch) {
+        if (startsWith(ch)) {
+            offsetStart(1);
+        }
+    }
+
     public void offsetSuffix(CharArray suffix) {
         int len = commonSuffix(suffix);
         if (len == suffix.length()) {
             offsetEnd(len);
+        }
+    }
+
+    public void offsetSuffix(char ch) {
+        if (endsWith(ch)) {
+            offsetEnd(1);
         }
     }
 

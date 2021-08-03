@@ -306,6 +306,10 @@ public class CharArray implements CharSequence {
         return cutPrefix(new CharArray(prefix));
     }
 
+    public CharArray cutPrefix(char ch) {
+        return startsWith(ch) ? substringFrom(1) : this;
+    }
+
     public CharArray cutSuffix(CharArray suffix) {
         int len = commonSuffix(suffix);
         return len < suffix.length() ? this : substringUntil(length() - len);
@@ -313,6 +317,10 @@ public class CharArray implements CharSequence {
 
     public CharArray cutSuffix(CharSequence suffix) {
         return cutSuffix(new CharArray(suffix));
+    }
+
+    public CharArray cutSuffix(char ch) {
+        return endsWith(ch) ? substringUntil(length() - 1) : this;
     }
 
     @Override

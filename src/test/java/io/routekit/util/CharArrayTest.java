@@ -422,7 +422,7 @@ public class CharArrayTest {
     }
 
     @Test
-    public void cutPrefix() {
+    public void cutPrefix_array() {
         CharArray foobar = new CharArray("foobar");
         CharArray foo = new CharArray("foo");
         CharArray bar = new CharArray("bar");
@@ -442,7 +442,19 @@ public class CharArrayTest {
     }
 
     @Test
-    public void cutSuffix() {
+    public void cutPrefix_str() {
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix(""), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix("foo"), new CharArray("bar"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix("bar"), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix("fooba"), new CharArray("r"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix("foobar"), new CharArray(""));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix("foobarbaz"), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix('f'), new CharArray("oobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutPrefix('o'), new CharArray("foobar"));
+    }
+
+    @Test
+    public void cutSuffix_array() {
         CharArray foobar = new CharArray("foobar");
         CharArray foo = new CharArray("foo");
         CharArray bar = new CharArray("bar");
@@ -459,6 +471,18 @@ public class CharArrayTest {
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(1)), new CharArray("b"));   // cut ar
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(2)), new CharArray("ba"));  // cut r
         Assertions.assertEquals(foobar.substringFrom(3).cutSuffix(bar.substringFrom(3)), bar);
+    }
+
+    @Test
+    public void cutSuffix_str() {
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix(""), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix("bar"), new CharArray("foo"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix("foo"), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix("oobar"), new CharArray("f"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix("foobar"), new CharArray(""));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix("foofoobar"), new CharArray("foobar"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix('r'), new CharArray("fooba"));
+        Assertions.assertEquals(new CharArray("foobar").cutSuffix('a'), new CharArray("foobar"));
     }
 
     @Test
