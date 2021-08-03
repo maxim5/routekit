@@ -222,6 +222,28 @@ public class CharArrayTest {
     }
 
     @Test
+    public void contains() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertTrue(array.contains('o'));
+        Assertions.assertTrue(array.contains('b'));
+        Assertions.assertFalse(array.contains('f'));
+        Assertions.assertFalse(array.contains('a'));
+        Assertions.assertFalse(array.contains('x'));
+    }
+
+    @Test
+    public void containsAny() {
+        CharArray array = new CharArray("foobar", 1, 4);  // oob
+
+        Assertions.assertTrue(array.containsAny('o', 'b'));
+        Assertions.assertTrue(array.containsAny('o', 'x'));
+        Assertions.assertTrue(array.containsAny('b', 'x'));
+        Assertions.assertTrue(array.containsAny('b', 'a'));
+        Assertions.assertFalse(array.containsAny('a', 'x'));
+    }
+
+    @Test
     public void commonPrefix() {
         Assertions.assertEquals(0, new CharArray("foo").commonPrefix(new CharArray("bar")));
         Assertions.assertEquals(2, new CharArray("bar").commonPrefix(new CharArray("baz")));

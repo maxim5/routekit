@@ -258,6 +258,14 @@ public class CharArray implements CharSequence {
         return def;
     }
 
+    public boolean contains(char ch) {
+        return indexOf(ch) >= 0;
+    }
+
+    public boolean containsAny(char ch1, char ch2) {
+        return indexOfAny(ch1, ch2) >= 0;
+    }
+
     // Returns the length of the common prefix
     public int commonPrefix(CharArray array) {
         int index = Arrays.mismatch(chars, start, end, array.chars, array.start, array.end);
