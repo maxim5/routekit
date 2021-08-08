@@ -20,6 +20,10 @@ public class RouterSetup<T> {
         return this;
     }
 
+    public List<Rule<T>> getRules() {
+        return rules;
+    }
+
     public RouterSetup<T> add(Query query, T handler) {
         rules.add(new Rule<>(query, handler));
         return this;
