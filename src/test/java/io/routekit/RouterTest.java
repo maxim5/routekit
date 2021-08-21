@@ -15,6 +15,15 @@ public class RouterTest {
     // Trivial cases
 
     @Test
+    public void routeOrNull_empty() {
+        Router<String> router = new RouterSetup<String>().build();
+        assert404(router.routeOrNull(""));
+        assert404(router.routeOrNull("/"));
+        assert404(router.routeOrNull("a"));
+        assert404(router.routeOrNull("foo"));
+    }
+
+    @Test
     public void routeOrNull_const_rules_no_prefix() {
         Router<String> router = new RouterSetup<String>()
                 .add("foo", "1")

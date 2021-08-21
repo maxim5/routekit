@@ -4,10 +4,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static io.routekit.NodePrinter.printlnToString;
 
 public class RouterBuilderTest {
+    @Test
+    public void buildStateMachine_empty() {
+        Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(List.of());
+        assertLines(printlnToString(node), """
+        <root>
+        """);
+    }
+
     @Test
     public void buildStateMachine_constants_common_part() {
         Router.Node<String> node = new RouterBuilder().setExcludeConstFromFSM(false).buildStateMachine(Arrays.asList(
