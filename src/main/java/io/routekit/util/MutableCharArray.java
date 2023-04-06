@@ -2,6 +2,9 @@ package io.routekit.util;
 
 import java.nio.CharBuffer;
 
+/**
+ * A mutable version of the {@link CharArray}.
+ */
 public class MutableCharArray extends CharArray {
     public MutableCharArray(char[] chars, int start, int end) {
         super(chars, start, end);

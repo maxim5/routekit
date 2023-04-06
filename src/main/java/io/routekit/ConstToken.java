@@ -4,6 +4,9 @@ import io.routekit.util.CharArray;
 
 import java.util.Objects;
 
+/**
+ * A string literal token.
+ */
 public final class ConstToken implements Token {
     private final CharArray token;
 

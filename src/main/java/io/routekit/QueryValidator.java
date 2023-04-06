@@ -21,7 +21,7 @@ import java.util.function.Consumer;
         vars.forEach(this::checkVarName);
         if (vars.size() > 1) {
             QueryParseException.failIf(vars.size() > vars.stream().distinct().count(),
-                    "Query contains duplicate variables", input);
+                "Query contains duplicate variables", input);
         }
     }
 

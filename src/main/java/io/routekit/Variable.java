@@ -2,10 +2,13 @@ package io.routekit;
 
 import java.util.Objects;
 
-public class Variable {
+/**
+ * A base class for a named variable.
+ */
+public abstract class Variable {
     private final String name;
 
-    public Variable(String name) {
+    protected Variable(String name) {
         this.name = name;
     }
 
@@ -14,7 +17,7 @@ public class Variable {
     }
 
     // Makes sure that empty match satisfies the option.
-    protected int handleEmptyMatch(int match) {
+    protected static int handleEmptyMatch(int match) {
         return (match == 0) ? -1 : match;
     }
 

@@ -2,6 +2,9 @@ package io.routekit;
 
 import io.routekit.util.CharArray;
 
+/**
+ * A separable variable matches everything until the first {@code separator}.
+ */
 public final class SeparableVariableToken extends Variable implements Token {
     private final char separator;
 

@@ -30,7 +30,8 @@ public class RouterSetup<T> {
     }
 
     public RouterSetup<T> add(String query, T handler) {
-        return add(new StringQuery(query, parser), handler);
+        List<Token> tokens = parser.parse(query);
+        return add(new StringQuery(query, tokens), handler);
     }
 
     public RouterSetup<T> addAll(Map<Query, T> handlers) {

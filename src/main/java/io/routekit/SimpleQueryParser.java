@@ -7,6 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A query parser that recognizes basic token set. Example accepted queries:
+ * <pre>
+ *     /foo/bar          -> no variables, a single string literal
+ *     /{foo}            -> string literals and one variable {foo}
+ *     /foo/{foo}/{*bar} -> two variables {foo} and {*bar} (wildcard)
+ * </pre>
+ *
+ * @param separator a char that marks the end of a variable
+ */
 public record SimpleQueryParser(char separator) implements QueryParser {
     public static final char VAR_OPEN = '{';
     public static final char VAR_CLOSE = '}';

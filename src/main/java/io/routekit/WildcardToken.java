@@ -2,6 +2,9 @@ package io.routekit;
 
 import io.routekit.util.CharArray;
 
+/**
+ * A wildcard variable matches everything until the end of the input.
+ */
 public final class WildcardToken extends Variable implements Token {
     public WildcardToken(String name) {
         super(name);
